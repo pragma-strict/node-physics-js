@@ -7,6 +7,8 @@ var GRID_Y_OFFSET;
 var gridHeight;
 var gridWidth;
 
+var isDragging = false;
+
 function setupGrid()
 {
 	GRID_TILE_SIZE = 20;
@@ -18,55 +20,105 @@ function setupGrid()
 }
 
 
-// takes an x,y screen pixel coordinate and colours in the grid pixel within which the screen pixel lies
-function drawPixelOnGrid(x, y, color)
+// Returns an (x,y) coordinate pair array (in world space) representing the top-left of the grid pixel in which the input coords lay.
+// (Essentially rounds off the input coords to the coords of a grid tile)
+function roundCoordinatesToTile(point)
 {
-	//console.log("drawing at " + (GRID_X_OFFSET + GRID_TILE_SIZE * x) + ", " + (GRID_TILE_SIZE * y));
-	//console.log("drawing pixel: " + x + ", " + y);
-	fill(color);
 	var gridTileX;
 	var gridTileY; 
-	if(x >= 0)
+	if(point[X] >= 0)
 	{
-		gridTileX = x - (x % GRID_TILE_SIZE);
+		gridTileX = point[X] - (point[X] % GRID_TILE_SIZE);
 	}
 	else
 	{
-		gridTileX = x - (GRID_TILE_SIZE - (abs(x) % GRID_TILE_SIZE));
+		gridTileX = point[X] - (GRID_TILE_SIZE - (abs(point[X]) % GRID_TILE_SIZE));
 	}
 
-	if(y >= 0)
+	if(point[Y] > 0)
 	{
-		gridTileY = y - (y % GRID_TILE_SIZE) - GRID_TILE_SIZE;
+		gridTileY = point[Y] - (point[Y] % GRID_TILE_SIZE);
 	}
 	else
 	{
-		gridTileY = y - (GRID_TILE_SIZE - (abs(y) % GRID_TILE_SIZE));
+		gridTileY = point[Y] - (GRID_TILE_SIZE - (abs(point[Y]) % GRID_TILE_SIZE));
 	}
-	rect(GRID_X_OFFSET + gridTileX, GRID_Y_OFFSET + gridTileY, GRID_TILE_SIZE, GRID_TILE_SIZE);
+
+	return [gridTileX, gridTileY];
 }
 
 
-function drawCenterLine()
+
+// colours in the grid pixel in which the input (world) coordinates lay
+function drawGridPixelFromWorldCoordinates(point, color)
 {
-	stroke(BACKGROUND_COLOR[0] - 20, BACKGROUND_COLOR[1] - 20, BACKGROUND_COLOR[2] - 20);
+	fill(color);
+	strokeWeight(0);
+	var gridTileScreenCoordinates = convertWorldToScreenCoordinates(roundCoordinatesToTile(point));
+	rect(gridTileScreenCoordinates[0], gridTileScreenCoordinates[1], GRID_TILE_SIZE, GRID_TILE_SIZE);
+}
+
+
+// Draw a cross with its center at 0, 0 in world space
+function drawCenterLines()
+{
+	stroke(BG_COL_SHADE_2);
 	strokeWeight(1);
 	line(GRID_X_OFFSET, 0, GRID_X_OFFSET, height);
+	line(0, GRID_Y_OFFSET, width, GRID_Y_OFFSET);
 }
 
+
+// Draw grid lines aligned with 0, 0 in world space
 function drawGridLines()
 {
-	stroke(BACKGROUND_COLOR[0] - 10, BACKGROUND_COLOR[1] - 10, BACKGROUND_COLOR[2] - 10);
+	// First find the gap between the left-most grid line and the left of the screen. Same for the top.
+	// Then draw the lines from left to right and then from top to bottom, starting at the left-most and top-most pointss.
+
+	var leftGap = abs(GRID_X_OFFSET % GRID_TILE_SIZE);
+	var topGap = abs(GRID_Y_OFFSET % GRID_TILE_SIZE);
+
+	stroke(BG_COL_SHADE_1);
 	strokeWeight(1);
-	for(i = 0; i < GRID_X_OFFSET /GRID_TILE_SIZE; i++)	// Draw horizontal lines
+
+	for(i = leftGap; i < width; i += GRID_TILE_SIZE)
 	{
-		line(GRID_X_OFFSET + i * GRID_TILE_SIZE, 0, GRID_X_OFFSET + i * GRID_TILE_SIZE, height);
-		line(GRID_X_OFFSET - i * GRID_TILE_SIZE, 0, GRID_X_OFFSET - i * GRID_TILE_SIZE, height);
+		line(i, 0, i, height);
 	}
-	for(i = 0; i < GRID_Y_OFFSET /GRID_TILE_SIZE; i++)	// Draw vertical lines
+	for(i = topGap; i < height; i += GRID_TILE_SIZE)
 	{
-		line(0, GRID_Y_OFFSET + i * GRID_TILE_SIZE, width, GRID_Y_OFFSET + i * GRID_TILE_SIZE);
-		line(0, GRID_Y_OFFSET - i * GRID_TILE_SIZE, width, GRID_Y_OFFSET - i * GRID_TILE_SIZE);
+		line(0, i, width, i);
 	}
-	drawCenterLine();
+	
+	drawCenterLines();
+}
+
+
+function convertScreenToWorldCoordinates(point)
+{
+	return [point[X] - GRID_X_OFFSET, point[Y] - GRID_Y_OFFSET];
+}
+
+
+function convertWorldToScreenCoordinates(point)
+{
+	return [point[X] + GRID_X_OFFSET, point[Y] + GRID_Y_OFFSET];	
+}
+
+
+function drawCoordinatesToScreen(x, y, verticalOffset)
+{
+	fill(0);
+	strokeWeight(0);
+	text((x + ", " + y), x + HALF_GRID_TILE_SIZE, y - verticalOffset);
+}
+
+
+
+function mouseDragged()
+{
+	var dx = mouseX - pmouseX;	// change in x
+	var dy = mouseY - pmouseY;	// change in y
+	GRID_X_OFFSET += dx;
+	GRID_Y_OFFSET += dy;
 }
