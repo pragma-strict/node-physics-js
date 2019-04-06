@@ -27,6 +27,7 @@ function renderNodeInspector(node)
 		text("Mass: " + round(node.mass), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Center of mass text, dot and vector
+		/*
 		bodyToTextDistance += leading;
 		var COM = n_calculateArmatureCenterOfMass(node);
 		text("Armature Center Of Mass: " + round(COM[X]) + ", " + round(COM[Y]), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
@@ -38,6 +39,13 @@ function renderNodeInspector(node)
 		var nodePosInScreenSpace = convertWorldToScreenCoordinates(node.pos);
 		line(nodePosInScreenSpace[X], nodePosInScreenSpace[Y], COM[X], COM[Y]);
 		strokeWeight(0);
+		*/
+
+		
+		// Torque
+		bodyToTextDistance += leading;
+		text("Torque: " + node.netTorque, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		
 	}
 	else
 	{

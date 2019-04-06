@@ -1,4 +1,6 @@
 
+var NODE_SIZE = 8;
+
 var PROPERTY_THRESHOLD;
 var PIXEL_COLOR;
 var DEFAULT_DAUGHTER_ANGLE;
@@ -8,10 +10,6 @@ var DEFAULT_MASS;
 
 var rootNode;
 
-// These variables are for the use of the functions which calculate center of mass. 
-// They are global as a workaround to returning multiple values of different types. (Is this even necessary in Javascript?)
-var massPositionProductSum = [0, 0];
-var massSum = 0;
 
 
 
@@ -30,6 +28,7 @@ function setupNode()
 		children: null,
 		angles: DEFAULT_DAUGHTER_ANGLE,
 		mass: DEFAULT_MASS,
+		netTorque: 0,
 		property: 100
 	}
 }
@@ -45,6 +44,7 @@ function n_create(parentNode)
 			children: null, 
 			angles: null, 
 			mass: DEFAULT_MASS, 
+			netTorque: 0,
 			property: parentNode.property /2
 		};	// create new node with all nulls
 
@@ -77,36 +77,29 @@ function n_divide(node)
 }
 
 
-function n_calculateArmatureCenterOfMass(node)
+// Recursively crawl up the node tree and calculate and save torque forces on each node.
+// Toqrue left is negative and right is positive.
+function n_recalculateTorques(node)
 {
 	if(node == null)	// error check
 	{
-		console.log("<!> calculateArmatureCOM: input node is null!");
+		console.log("<!> calculateArmatureCOM: input node is null!");	
 	}
-	
-	// Reset mass and massPositionProduct sums
-	massSum = 0;
-	massPositionProductSum = [0, 0];
 
-	n_addMassSumsFromNode(node);	// Recalculate mass sums starting from the current node
-
-	var centerOfMass = [massPositionProductSum[0] / massSum, massPositionProductSum[1] / massSum];
-	return centerOfMass;
-}
-
-
-function n_addMassSumsFromNode(node)
-{
-	var massPositionProduct = [node.mass * node.pos[X], node.mass * node.pos[Y]];
-
-	massSum += node.mass;
-	massPositionProductSum[0] += massPositionProduct[0];
-	massPositionProductSum[1] += massPositionProduct[1];
-
-	if(node.children != null)
+	if(node.children == null)	// base case, return.
 	{
-		n_addMassSumsFromNode(node.children);	// This is recursive to support multiple children in the future
-	}	
+		return node.mass;
+	}
+
+	/*	Recursive call to find mass sum off all descendants, then use that mass to apply a torque force originating from this node's children	*/
+	var totalMass =	n_recalculateTorques(node.children);
+	node.netTorque = calculateGravitationalTorque(calculateDistance2D(node.pos, node.children.pos), totalMass, calculateAbsoluteAngle(node.pos, node.children.pos));
+
+	/*	Update the total mass with our own mass before we return it.		*/
+	totalMass += node.mass;
+
+	/*	Return the total mass	*/
+	return totalMass;
 }
 
 
@@ -122,8 +115,6 @@ function n_drawPixels(node)
 
 function n_drawTree(node)
 {
-	strokeWeight(6);
-	stroke(0);
 	if(node.children != null)
 	{
 		strokeWeight(2);
@@ -131,7 +122,40 @@ function n_drawTree(node)
 		line(GRID_X_OFFSET + node.pos[0], GRID_Y_OFFSET + node.pos[1], GRID_X_OFFSET + node.children.pos[0], GRID_Y_OFFSET + node.children.pos[1]);
 		n_drawTree(node.children);
 	}
+	if(node == selectedNode)
+	{
+		stroke(RED);
+	}
+	else
+	{
+		stroke(0);		
+	}
+	strokeWeight(6);
 	point(GRID_X_OFFSET + node.pos[0], GRID_Y_OFFSET + node.pos[1]);
+}
+
+
+// Return the first node that is within cutoffDistance of a point
+function n_findNodeNearPoint(node, point, cutoffDistance)
+{
+	if(node == null)	// error check
+	{
+		console.log("<!> n_findNodeNearPoint: node is NULL!!!");
+		return null;	
+	}
+
+	if(calculateDistance2D(node.pos, point) <= cutoffDistance)	// check if point is within cutoffDistance of node
+	{
+		return node;
+	}
+	else if(node.children != null)
+	{
+		return n_findNodeNearPoint(node.children, point, cutoffDistance);
+	}
+	else
+	{
+		return null;
+	}
 }
 
 
