@@ -8,10 +8,6 @@ World space coordinates are translated back into screen space only when everythi
 */
 
 var cnv;
-var BG_COL = [245, 247, 232];
-var BG_COL_SHADE_AMT = 20;
-var BG_COL_SHADE_1 = [null, null, null];
-var BG_COL_SHADE_2 = [null, null, null];
 
 var X = 0;  // X and Y are used in place of 0 and 1 when accessing the indexes of coordinate pair arrays for clarity.
 var Y = 1;
@@ -19,8 +15,6 @@ var Y = 1;
 var selectedNode = null;
 
 function setup() {
-  BG_COL_SHADE_1 = [BG_COL[0] - BG_COL_SHADE_AMT, BG_COL[1] - BG_COL_SHADE_AMT, BG_COL[2] - BG_COL_SHADE_AMT];
-  BG_COL_SHADE_2 = [BG_COL[0] - 2*BG_COL_SHADE_AMT, BG_COL[1] - 2*BG_COL_SHADE_AMT, BG_COL[2] - 2*BG_COL_SHADE_AMT];
 
   cnv = createCanvas(windowWidth, windowHeight);
   repositionCanvas();

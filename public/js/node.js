@@ -20,8 +20,8 @@ function setupNode()
 	PROPERTY_THRESHOLD = 5;
 	PIXEL_COLOR = [26, 173, 48];
 	DEFAULT_DAUGHTER_ANGLE = PI/2;
-	MIN_DAUGHTER_ANGLE = PI/2 - PI/4;
-	MAX_DAUGHTER_ANGLE = PI/2 + PI/4;
+	MIN_DAUGHTER_ANGLE = PI/2 - PI/2;
+	MAX_DAUGHTER_ANGLE = PI/2 + PI/2;
 	DEFAULT_MASS = 1;
 
 	rootNode = {
@@ -75,9 +75,6 @@ function n_divide(node)
 		}
 	}
 }
-
-
-
 
 
 function n_calculateArmatureCenterOfMass(node)
