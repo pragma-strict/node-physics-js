@@ -9,6 +9,19 @@ function getPointAtEndOfArm(x, y, angle, armLength)
 		console.log("<!> getPointAtEndOfArm - NULL PARAMETER!!!");
 	}
 
+
+	//	Bring angle into acceptable range (0 - 2PI)
+	while(angle < 0)
+	{
+		angle += TWO_PI;
+	}
+
+	while(angle >= TWO_PI)
+	{
+		angle -= TWO_PI;
+	}
+
+
 	var newPoint = [x, y];	// initialize new point
 
 	//console.log("getPointAtEndOfArm: " + angle + ", cos: " + cos(angle));

@@ -12,25 +12,32 @@ var cnv;
 var X = 0;  // X and Y are used in place of 0 and 1 when accessing the indexes of coordinate pair arrays for clarity.
 var Y = 1;
 
+var isPlaying = true;
+var mouseIsPressed = false;
+
 var selectedNode = null;
+var restartButton = null;
+var addButton = null;
 
 function setup() {
-
   cnv = createCanvas(windowWidth, windowHeight);
   repositionCanvas();
+  
+  restartButton = button_create(width - (width / 10), height/16, width/14, height/14, "Restart Sim");
+  addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
   angleMode(RADIANS);
+  
 
   setupGrid();
-  setupNode();
+  n_setup();
+  setupNewSimulation();
+}
 
-  n_divide(rootNode);
-  n_divide(rootNode);
-  n_divide(rootNode);
-  n_divide(rootNode);
 
-  n_recalculateTorques(rootNode);
-
-  drawFrame();
+function setupNewSimulation()
+{
+  n_createRoot();
+  selectedNode = null;
 }
 
 
@@ -45,6 +52,8 @@ function repositionCanvas()
 function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
 	repositionCanvas();
+  button_updatePosition(restartButton, width - (width / 10), height/ 16);
+  button_updatePosition(addButton, width - (width / 10), height/16 + height/12);
 	drawFrame();
 }
 
@@ -53,65 +62,95 @@ function drawFrame()
   background(BG_COL);
   drawGridPixelFromWorldCoordinates(convertScreenToWorldCoordinates([mouseX, mouseY]), BG_COL_SHADE_1); // draw hovered pixel
   drawGridLines();
+  button_draw(restartButton);
+  button_draw(addButton);
 
   strokeWeight(0);
   fill(0);
   text(((mouseX - GRID_X_OFFSET) + ", " + (mouseY - GRID_Y_OFFSET)), mouseX, mouseY);
 
-  //n_drawPixels(rootNode);
-  n_drawTree(rootNode);
+  n_drawPixels(rootNode);
+  if(isPlaying)
+  {
+    tickPhysics();
+  }
+  //n_drawTree(rootNode);
 }
-var p1 = null;
-var p2 = null;
+
+
+// Ticks all the physics things
+function tickPhysics()
+{
+  n_recalculateTorques(rootNode);
+  n_applyTorques(rootNode);
+  n_updatePositions(rootNode);
+}
 
 function draw()
 {
-
   drawFrame();
   renderNodeInspector(selectedNode);
-
-  /**             // Point comparison utility
   stroke(RED);
-  strokeWeight(8);
-  if(p1 != null)
+  strokeWeight(10);
+
+  // Mouse dragging logic
+  if(!button_checkMouseOver(restartButton) && mouseIsPressed)
   {
-    point(p1[X], p1[Y]);
+    var dx = mouseX - pmouseX; // change in x
+    var dy = mouseY - pmouseY; // change in y
+    GRID_X_OFFSET += dx;
+    GRID_Y_OFFSET += dy;
   }
-  if(p2 != null)
-  {
-    point(p2[X], p2[Y]);
-  }
-  if(p1 != null && p2 != null)
-  {
-    noStroke();
-    fill(0);
-    text(calculateAngle(p1, p2), p1[X] + 5, p2[X] + 5);
-  }
-  **/
 }
 
 
 function mousePressed()
 {
-  /**     // Point comparison utility
-  if(p1 == null)
+  mouseIsPressed = true;  // log mouse press
+
+  if(button_checkMouseOver(restartButton))  // button - restart sim
   {
-    p1 = [mouseX, mouseY];
+    setupNewSimulation();
   }
-  else if(p2 == null)
+  else if(button_checkMouseOver(addButton)) // button - add node
   {
-    p2 = [mouseX, mouseY];
+    n_add(rootNode);
   }
-  else
-  {
-    p1 = null;
-    p2 = null;
-  }
-  **/
+
+
   var mousePosInWorldSpace = convertScreenToWorldCoordinates([mouseX, mouseY]);
   var selection = n_findNodeNearPoint(rootNode, mousePosInWorldSpace, NODE_SIZE);
   if(selection != null)
   {
     selectedNode = selection;
+    renderNodeInspector(selectedNode);
+  }
+}
+
+
+function mouseReleased()
+{
+  mouseIsPressed = false;
+}
+
+
+function keyPressed()
+{
+  if(key == ' ')
+  {
+    isPlaying = !isPlaying;
+  }
+  if(key == 'e')
+  {
+    tickPhysics();
+  }
+  if(key == 'd')
+  {
+    console.log(GRID_X_OFFSET);
+    console.log(mouseX - previousMouseX);
+  }
+  if(key == 'a')
+  {
+    n_add(rootNode);
   }
 }

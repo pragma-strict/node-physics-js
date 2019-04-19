@@ -7,11 +7,12 @@ var GRID_Y_OFFSET;
 var gridHeight;
 var gridWidth;
 
+
 var isDragging = false;
 
 function setupGrid()
 {
-	GRID_TILE_SIZE = 20;
+	GRID_TILE_SIZE = 12;
 	HALF_GRID_TILE_SIZE = GRID_TILE_SIZE /2;
 	gridHeight = ceil(height / GRID_TILE_SIZE);
 	gridWidth = ceil(width / GRID_TILE_SIZE);
@@ -114,11 +115,3 @@ function drawCoordinatesToScreen(x, y, verticalOffset)
 }
 
 
-
-function mouseDragged()
-{
-	var dx = mouseX - pmouseX;	// change in x
-	var dy = mouseY - pmouseY;	// change in y
-	GRID_X_OFFSET += dx;
-	GRID_Y_OFFSET += dy;
-}
