@@ -1,5 +1,11 @@
 
 /*
+
+TODO:
+- Node should be an actual class and there should be a separate class to handle the graph. Right now node.js does both. 
+- The physics node should probably outsource all of its physics to physics.js by just calling the basic generic functions provided there.
+- Generally, the "plant tree" thing should be decoupled from the idea of a node. 
+
 Notes on coordinate spaces:
 Everything is calculated and handled in "World space".
 World space is a coordinate plane of the same size as screen space (1:1 pixels) but translated by some x offset and y offset.
@@ -69,12 +75,11 @@ function drawFrame()
   fill(0);
   text(((mouseX - GRID_X_OFFSET) + ", " + (mouseY - GRID_Y_OFFSET)), mouseX, mouseY);
 
-  n_drawPixels(rootNode);
   if(isPlaying)
   {
     tickPhysics();
   }
-  //n_drawTree(rootNode);
+  n_drawTree(rootNode);
 }
 
 
