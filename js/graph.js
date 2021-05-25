@@ -10,6 +10,7 @@ class Graph{
     // Add a node to the graph at a given position
     addNode(position){
         this.nodes.push(new Node(position, 1.0));
+        console.log("Added node at: " + position);
     }
 
 
@@ -21,9 +22,9 @@ class Graph{
     }
 
 
-    render(){
+    render(originOffset){
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].render();
+            this.nodes[i].render(originOffset, 0);
         }
     }
 

@@ -101,7 +101,7 @@ function draw()
     GRID_Y_OFFSET += dy;
   }
 
-  graph.render();
+  graph.render(createVector(GRID_X_OFFSET, GRID_Y_OFFSET));
 }
 
 
@@ -119,13 +119,16 @@ function mousePressed()
   }
 
 
-  var mousePosInWorldSpace = convertScreenToWorldCoordinates([mouseX, mouseY]);
-  graph.addNode(mousePosInWorldSpace);
+  var mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
   var selection = n_findNodeNearPoint(rootNode, mousePosInWorldSpace, NODE_SIZE);
   if(selection != null)
   {
     selectedNode = selection;
     // renderNodeInspector(selectedNode);
+  }
+
+  if(mouseButton === RIGHT){
+    graph.addNode(mousePosInWorldSpace);
   }
 }
 

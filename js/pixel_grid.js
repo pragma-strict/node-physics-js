@@ -27,25 +27,25 @@ function roundCoordinatesToTile(point)
 {
 	var gridTileX;
 	var gridTileY; 
-	if(point[X] >= 0)
+	if(point.x >= 0)
 	{
-		gridTileX = point[X] - (point[X] % GRID_TILE_SIZE);
+		gridTileX = point.x - (point.x % GRID_TILE_SIZE);
 	}
 	else
 	{
-		gridTileX = point[X] - (GRID_TILE_SIZE - (abs(point[X]) % GRID_TILE_SIZE));
+		gridTileX = point.x - (GRID_TILE_SIZE - (abs(point.x) % GRID_TILE_SIZE));
 	}
 
-	if(point[Y] > 0)
+	if(point.y > 0)
 	{
-		gridTileY = point[Y] - (point[Y] % GRID_TILE_SIZE);
+		gridTileY = point.y - (point.y % GRID_TILE_SIZE);
 	}
 	else
 	{
-		gridTileY = point[Y] - (GRID_TILE_SIZE - (abs(point[Y]) % GRID_TILE_SIZE));
+		gridTileY = point.y - (GRID_TILE_SIZE - (abs(point.y) % GRID_TILE_SIZE));
 	}
 
-	return [gridTileX, gridTileY];
+	return createVector(gridTileX, gridTileY);
 }
 
 
@@ -56,7 +56,7 @@ function drawGridPixelFromWorldCoordinates(point, color)
 	fill(color);
 	strokeWeight(0);
 	var gridTileScreenCoordinates = convertWorldToScreenCoordinates(roundCoordinatesToTile(point));
-	rect(gridTileScreenCoordinates[0], gridTileScreenCoordinates[1], GRID_TILE_SIZE, GRID_TILE_SIZE);
+	rect(gridTileScreenCoordinates.x, gridTileScreenCoordinates.y, GRID_TILE_SIZE, GRID_TILE_SIZE);
 }
 
 
@@ -97,13 +97,13 @@ function drawGridLines()
 
 function convertScreenToWorldCoordinates(point)
 {
-	return [point[X] - GRID_X_OFFSET, point[Y] - GRID_Y_OFFSET];
+	return createVector(point.x - GRID_X_OFFSET, point.y - GRID_Y_OFFSET);
 }
 
 
 function convertWorldToScreenCoordinates(point)
 {
-	return [point[X] + GRID_X_OFFSET, point[Y] + GRID_Y_OFFSET];	
+	return createVector(point.x + GRID_X_OFFSET, point.y + GRID_Y_OFFSET);	
 }
 
 

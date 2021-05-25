@@ -15,9 +15,9 @@ class Node{
     }
 
 
-    render(color){
+    render(positionOffset, color){
         fill(color);
-        ellipse(this.position.x, this.position.y, 5, 5)
+        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 5, 5)
     }
 
 
