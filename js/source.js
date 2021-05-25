@@ -25,6 +25,8 @@ var selectedNode = null;
 var restartButton = null;
 var addButton = null;
 
+let graph = new Graph();
+
 function setup() {
   cnv = createCanvas(windowWidth, windowHeight);
   repositionCanvas();
@@ -33,17 +35,7 @@ function setup() {
   addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
   angleMode(RADIANS);
   
-
   setupGrid();
-  n_setup();
-  setupNewSimulation();
-}
-
-
-function setupNewSimulation()
-{
-  n_createRoot();
-  selectedNode = null;
 }
 
 
@@ -63,6 +55,7 @@ function windowResized() {
 	drawFrame();
 }
 
+
 function drawFrame()
 {
   background(BG_COL);
@@ -79,22 +72,23 @@ function drawFrame()
   {
     tickPhysics();
   }
-  n_drawTree(rootNode);
+  // n_drawTree(rootNode);
 }
 
 
 // Ticks all the physics things
 function tickPhysics()
 {
-  n_recalculateTorques(rootNode);
-  n_applyTorques(rootNode);
-  n_updatePositions(rootNode);
+  graph.tick();
+  // n_recalculateTorques(rootNode);
+  // n_applyTorques(rootNode);
+  // n_updatePositions(rootNode);
 }
 
 function draw()
 {
   drawFrame();
-  renderNodeInspector(selectedNode);
+  // renderNodeInspector(selectedNode);
   stroke(RED);
   strokeWeight(10);
 
@@ -106,6 +100,8 @@ function draw()
     GRID_X_OFFSET += dx;
     GRID_Y_OFFSET += dy;
   }
+
+  graph.render();
 }
 
 
@@ -115,20 +111,21 @@ function mousePressed()
 
   if(button_checkMouseOver(restartButton))  // button - restart sim
   {
-    setupNewSimulation();
+    // setupNewSimulation();
   }
   else if(button_checkMouseOver(addButton)) // button - add node
   {
-    n_add(rootNode);
+    // n_add(rootNode);
   }
 
 
   var mousePosInWorldSpace = convertScreenToWorldCoordinates([mouseX, mouseY]);
+  graph.addNode(mousePosInWorldSpace);
   var selection = n_findNodeNearPoint(rootNode, mousePosInWorldSpace, NODE_SIZE);
   if(selection != null)
   {
     selectedNode = selection;
-    renderNodeInspector(selectedNode);
+    // renderNodeInspector(selectedNode);
   }
 }
 
@@ -156,6 +153,6 @@ function keyPressed()
   }
   if(key == 'a')
   {
-    n_add(rootNode);
+    // n_add(rootNode);
   }
 }
