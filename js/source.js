@@ -127,7 +127,7 @@ function mousePressed()
     // renderNodeInspector(selectedNode);
   }
 
-  if(mouseButton === RIGHT){
+  if(mouseButton === LEFT){
     graph.addNode(mousePosInWorldSpace);
   }
 }
