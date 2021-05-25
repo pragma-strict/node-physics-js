@@ -1,3 +1,3 @@
 # Node_physics
 
-A simple node-based plant evolution sim with simulated physics at each node to guide the plants' evolutionary path.
+A simple node-based physics simulation system. To be used as a basis for other simple physics projects.
