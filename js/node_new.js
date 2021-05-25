@@ -11,7 +11,11 @@ class Node{
 
     // Calculate a physics step
     tick(){
+        this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
+        
+        // Apply gravity
+        this.applyForce(createVector(0, 9.8));
     }
 
 
@@ -23,6 +27,12 @@ class Node{
 
     // Apply an instantaneous force. i.e. change the velocity directly w/o changing acceleration
     applyImpulse(force){
-        this.velocity.add(force.divide(this.mass));
+        this.velocity.add(force.div(this.mass));
+    }
+
+
+    // Apply a force i.e. update acceleration
+    applyForce(force){
+        this.acceleration.add(force.div(this.mass));
     }
 }
