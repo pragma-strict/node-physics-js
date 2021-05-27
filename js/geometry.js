@@ -57,8 +57,8 @@ function getPointAtEndOfArm(x, y, angle, armLength)
 // Calculate distance between 2 points on the 2D plane
 function calculateDistance2D(p1, p2)
 {
-	var dx = p2[X] - p1[X];
-	var dy = p2[Y] - p1[Y];
+	var dx = p2.x - p1.x;
+	var dy = p2.y - p1.y;
 	return sqrt(pow(dx, 2) + pow(dy, 2));
 }
 

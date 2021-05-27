@@ -20,7 +20,6 @@ var cnv;
 var isPlaying = true;
 var mouseIsPressed = false;
 
-var selectedNode = null;
 var restartButton = null;
 var addButton = null;
 
@@ -87,7 +86,7 @@ function tickPhysics()
 function draw()
 {
   drawFrame();
-  renderNodeInspector(selectedNode);
+  renderNodeInspector(graph.selected);
   stroke(RED);
   strokeWeight(10);
 
@@ -119,12 +118,7 @@ function mousePressed()
 
 
   var mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
-  var selection = n_findNodeNearPoint(rootNode, mousePosInWorldSpace, NODE_SIZE);
-  if(selection != null)
-  {
-    selectedNode = selection;
-    renderNodeInspector(selectedNode);
-  }
+  graph.updateSelected(mousePosInWorldSpace);
 }
 
 

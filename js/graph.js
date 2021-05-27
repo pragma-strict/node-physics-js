@@ -4,6 +4,7 @@ class Graph{
     constructor()
     {
         this.nodes = new Array();
+        this.selected = null;
     }
 
     
@@ -34,9 +35,16 @@ class Graph{
     // Naive implementation
     getNodeNearPosition(position, maxDistance){
         for(let i = 0; i < this.nodes.length; i++){
-            if(calculateDistance2D(position, this.nodes[i].position) <= maxDistance){
+            if(position.dist(this.nodes[i].position) <= maxDistance){
                 return this.nodes[i];
             }
         }
+        return 0;
+    }
+
+
+    // Update the selected node given a click position
+    updateSelected(position){
+        this.selected = this.getNodeNearPosition(position, 8)
     }
 }

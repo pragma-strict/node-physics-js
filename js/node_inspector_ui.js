@@ -6,7 +6,7 @@ var inspectorWidth = 250;
 
 function renderNodeInspector(node)
 {
-	if(node != null)
+	if(node)
 	{
 		textAlign(LEFT);
 		var bodyToTextDistance = 0;
