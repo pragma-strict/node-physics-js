@@ -22,7 +22,7 @@ function renderNodeInspector(node)
 		textSize(16);
 		
 		// Position text
-		text("World position: " + round(node.pos[X]) + ", " + round(node.pos[Y]), leftScreenBuffer, topScreenBuffer + headerGap);
+		text("World position: " + round(node.position.x) + ", " + round(node.position.y), leftScreenBuffer, topScreenBuffer + headerGap);
 
 		// Mass text
 		bodyToTextDistance += leading;

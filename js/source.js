@@ -17,9 +17,6 @@ World space coordinates are translated back into screen space only when everythi
 
 var cnv;
 
-var X = 0;  // X and Y are used in place of 0 and 1 when accessing the indexes of coordinate pair arrays for clarity.
-var Y = 1;
-
 var isPlaying = true;
 var mouseIsPressed = false;
 
@@ -90,7 +87,7 @@ function tickPhysics()
 function draw()
 {
   drawFrame();
-  // renderNodeInspector(selectedNode);
+  renderNodeInspector(selectedNode);
   stroke(RED);
   strokeWeight(10);
 
@@ -126,11 +123,7 @@ function mousePressed()
   if(selection != null)
   {
     selectedNode = selection;
-    // renderNodeInspector(selectedNode);
-  }
-
-  if(mouseButton === LEFT){
-    graph.addNode(mousePosInWorldSpace);
+    renderNodeInspector(selectedNode);
   }
 }
 
@@ -158,6 +151,7 @@ function keyPressed()
   }
   if(key == 'a')
   {
-    // n_add(rootNode);
+    let mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
+    selectedNode = graph.addNode(mousePosInWorldSpace);
   }
 }
