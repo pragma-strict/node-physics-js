@@ -10,7 +10,7 @@ class Graph{
     
     // Add a node to the graph at a given position
     addNode(position){
-        let newNode = new Node(position, 1.0);
+        let newNode = new Node(position, 10);
         this.nodes.push(newNode);
         console.log("Added node at: " + position);
         return newNode;

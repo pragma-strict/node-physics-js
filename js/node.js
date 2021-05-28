@@ -6,6 +6,7 @@ class Node{
         this.mass = mass;
         this.velocity = createVector(0, 0);
         this.acceleration = createVector(0, 0);
+        this.applyForce(createVector(0, 9.8));
     }
 
 
@@ -15,7 +16,28 @@ class Node{
         this.position.add(this.velocity);
         
         // Apply gravity
-        this.applyForce(createVector(0, 9.8));
+        //this.applyForce(createVector(0, 9.8));
+
+        // Apply boundaries
+        if(this.position.x < -width/2){
+            this.position.x = -width/2;
+            this.velocity.x *= -1;
+        }
+
+        if(this.position.x > width/2){
+            this.position.x = width/2;
+            this.velocity.x *= -1;
+        }
+
+        if(this.position.y < -height/2){
+            this.position.y = -height/2;
+            this.velocity.y *= -1;
+        }
+
+        if(this.position.y > height/2){
+            this.position.y = height/2;
+            this.velocity.y *= -1;
+        }
     }
 
 
