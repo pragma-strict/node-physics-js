@@ -52,12 +52,16 @@ class Graph{
 
         // Render nodes
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].render(originOffset, 0, false);
+            this.nodes[i].render(originOffset, 0);
         }
 
-        // Re-render selected node with highlight
+        // Re-render selected node and neighbors with highlights
         if(this.selected){
-            this.selected.render(originOffset, 0, true);
+            let selectedNeighbors = this.getNeighbors(this.getIndexOf(this.selected));
+            for(let i = 0; i < selectedNeighbors.length; i++){
+                selectedNeighbors[i].render(originOffset, color(0, 230, 230));
+            }
+            this.selected.render(originOffset,color(230, 0, 38));
         }
 
         // Render edges
@@ -99,8 +103,11 @@ class Graph{
     getNeighbors(index){
         let neighbors = new Array();
         for(let i = 0; i < this.edges.length; i++){
-            if(this.edges[i][0] === index || this.edges[i][1] === index){
-                neighbors.push(this.nodes[i]);
+            if(this.edges[i][0] === index){
+                neighbors.push(this.nodes[this.edges[i][1]]);
+            }
+            else if(this.edges[i][1] === index){
+                neighbors.push(this.nodes[this.edges[i][0]]);
             }
         }
         return neighbors;

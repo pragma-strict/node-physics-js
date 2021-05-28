@@ -49,7 +49,6 @@ function windowResized() {
 	resizeCanvas(windowWidth, windowHeight);
 	repositionCanvas();
   button_updatePosition(restartButton, width - (width / 10), height/ 16);
-  button_updatePosition(addButton, width - (width / 10), height/16 + height/12);
 	drawFrame();
 }
 
@@ -60,7 +59,6 @@ function drawFrame()
   drawGridPixelFromWorldCoordinates(convertScreenToWorldCoordinates([mouseX, mouseY]), BG_COL_SHADE_1); // draw hovered pixel
   drawGridLines();
   button_draw(restartButton);
-  button_draw(addButton);
 
   strokeWeight(0);
   fill(0);
@@ -70,7 +68,6 @@ function drawFrame()
   {
     tickPhysics();
   }
-  // n_drawTree(rootNode);
 }
 
 
@@ -78,9 +75,6 @@ function drawFrame()
 function tickPhysics()
 {
   graph.tick();
-  // n_recalculateTorques(rootNode);
-  // n_applyTorques(rootNode);
-  // n_updatePositions(rootNode);
 }
 
 function draw()
@@ -109,11 +103,7 @@ function mousePressed()
 
   if(button_checkMouseOver(restartButton))  // button - restart sim
   {
-    // setupNewSimulation();
-  }
-  else if(button_checkMouseOver(addButton)) // button - add node
-  {
-    // n_add(rootNode);
+    this.graph = new Graph();
   }
 
 

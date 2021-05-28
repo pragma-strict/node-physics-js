@@ -56,8 +56,7 @@ class Node{
 
         // Apply forces to neighbors
         for(let i = 0; i < neighbors.length; i++){
-            let relativePosition = this.position.sub(neighbors[i].position);
-            
+            // let relativePosition = this.position.sub(neighbors[i].position);
         }
 
         // Apply torques (angular accelerations) to other neighbors
@@ -68,12 +67,8 @@ class Node{
     }
 
 
-    render(positionOffset, color, isSelected){
+    render(positionOffset, color){
         fill(color);
-        if(isSelected){
-            strokeWeight(5);
-            stroke(200, 0, 0);
-        }
         ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15)
     }
 
@@ -93,6 +88,6 @@ class Node{
     // Updates angular acceleration
     applyTorque(force, relativePosition){
         let torqueForce = relativePosition.cross(force);
-        this.angularAcceleration += torqueForce/this.mass;
+        this.angularAcceleration += torqueForce.z / this.mass;
     }
 }
