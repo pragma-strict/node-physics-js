@@ -59,7 +59,7 @@ class Graph{
         if(this.selected){
             let selectedNeighbors = this.getNeighbors(this.getIndexOf(this.selected));
             for(let i = 0; i < selectedNeighbors.length; i++){
-                selectedNeighbors[i].render(originOffset, color(0, 230, 230));
+                selectedNeighbors[i].render(originOffset, color(170, 0, 10));
             }
             this.selected.render(originOffset,color(230, 0, 38));
         }

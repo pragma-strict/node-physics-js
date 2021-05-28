@@ -61,7 +61,7 @@ class Node{
 
         // Apply torques (angular accelerations) to other neighbors
         for(let i = 0; i < neighbors.length; i++){
-            let relativePosition = this.position.sub(neighbors[i].position);
+            let relativePosition = p5.Vector.sub(this.position, neighbors[i].position);
             neighbors[i].applyTorque(fGravity, relativePosition);
         }
     }
