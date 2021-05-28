@@ -30,23 +30,23 @@ function renderNodeInspector(node)
 		
 		// Torque
 		bodyToTextDistance += leading;
-		text("Torque: " + node.torque, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Velocity: " + node.velocity, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 		
 		// Tension
 		bodyToTextDistance += leading;
-		text("Tension: " + node.tension, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Accleration: " + node.acceleration, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Original Angle
 		bodyToTextDistance += leading;
-		text("Original Angle (of child): " + node.originalAngles, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Angular Velocity: " + node.angularVelocity, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Current Angle
 		bodyToTextDistance += leading;
-		text("Angle (of child): " + node.angles, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Angular Acceleration: " + node.angularAcceleration, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Deflection of child
 		bodyToTextDistance += leading;
-		text("Child Deflection: " + (node.originalAngles - node.angles), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Rotation: " + node.rotation, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 	}
 	else
 	{

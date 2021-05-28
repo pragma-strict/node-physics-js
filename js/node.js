@@ -6,6 +6,7 @@ class Node{
         this.mass = mass;
         this.velocity = createVector(0, 0);
         this.acceleration = createVector(0, 0);
+        this.rotation = 0.0;
         this.angularAcceleration = 0.0;
         this.angularVelocity = 0.0;
         this.bounciness = 0.4;
@@ -13,9 +14,11 @@ class Node{
 
 
     // Calculate a physics step
-    tick(){
+    tick(neighbors){
         this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
+        this.angularVelocity += this.angularAcceleration;
+        this.rotation += this.angularVelocity;
         
         // Apply gravity
         this.applyForce(createVector(0, 9.8));
@@ -44,6 +47,9 @@ class Node{
             this.velocity.y *= -this.bounciness;
             this.acceleration.y = 0;
         }
+
+        // Apply forces to other nodes
+
     }
 
 
