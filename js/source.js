@@ -146,6 +146,6 @@ function keyPressed()
   if(key == 'a')
   {
     let mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
-    selectedNode = graph.addNode(mousePosInWorldSpace);
+    graph.addNode(mousePosInWorldSpace);
   }
 }

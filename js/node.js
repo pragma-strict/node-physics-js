@@ -41,9 +41,13 @@ class Node{
     }
 
 
-    render(positionOffset, color){
+    render(positionOffset, color, isSelected){
         fill(color);
-        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 5, 5)
+        if(isSelected){
+            strokeWeight(5);
+            stroke(200, 0, 0);
+        }
+        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15)
     }
 
 
