@@ -41,7 +41,7 @@ class Graph{
     // Calls tick on all nodes
     tick(){
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].tick();
+            this.nodes[i].tick(this.getNeighbors(i));
         }
     }
 
@@ -92,6 +92,18 @@ class Graph{
             }
         }
         return -1;
+    }
+
+
+    // Return all nodes sharing an edge with the node at the given index
+    getNeighbors(index){
+        let neighbors = new Array();
+        for(let i = 0; i < this.edges.length; i++){
+            if(this.edges[i][0] === index || this.edges[i][1] === index){
+                neighbors.push(this.nodes[i]);
+            }
+        }
+        return neighbors;
     }
 
 

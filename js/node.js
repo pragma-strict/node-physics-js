@@ -15,13 +15,13 @@ class Node{
 
     // Calculate a physics step
     tick(neighbors){
+        
+        // Settle forces & accelerations from last tick
         this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
         this.angularVelocity += this.angularAcceleration;
         this.rotation += this.angularVelocity;
         
-        // Apply gravity
-        this.applyForce(createVector(0, 9.8));
 
         // Apply boundaries
         if(this.position.x < -width/2){
@@ -48,8 +48,23 @@ class Node{
             this.acceleration.y = 0;
         }
 
-        // Apply forces to other nodes
 
+        let fGravity = createVector(0, 9.8);
+
+        // Apply gravity
+        this.applyForce(fGravity);
+
+        // Apply forces to neighbors
+        for(let i = 0; i < neighbors.length; i++){
+            let relativePosition = this.position.sub(neighbors[i].position);
+            
+        }
+
+        // Apply torques (angular accelerations) to other neighbors
+        for(let i = 0; i < neighbors.length; i++){
+            let relativePosition = this.position.sub(neighbors[i].position);
+            neighbors[i].applyTorque(fGravity, relativePosition);
+        }
     }
 
 
@@ -69,8 +84,15 @@ class Node{
     }
 
 
-    // Apply a force i.e. update acceleration
+    // Updates acceleration
     applyForce(force){
         this.acceleration.add(force.div(this.mass));
+    }
+
+
+    // Updates angular acceleration
+    applyTorque(force, relativePosition){
+        let torqueForce = relativePosition.cross(force);
+        this.angularAcceleration += torqueForce/this.mass;
     }
 }
