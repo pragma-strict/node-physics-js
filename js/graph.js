@@ -39,9 +39,9 @@ class Graph{
 
 
     // Calls tick on all nodes
-    tick(){
+    tick(deltaTime){
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].tick(this.getNeighbors(i));
+            this.nodes[i].tick(deltaTime, this.getNeighbors(i));
         }
     }
 

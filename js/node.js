@@ -14,11 +14,12 @@ class Node{
 
 
     // Calculate a physics step
-    tick(neighbors){
-        
+    tick(deltaTime, neighbors){
+        console.log("ticking: init v:" + this.velocity);
         // Settle forces & accelerations from last tick
         this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
+        console.log("ticking: new v:" + this.velocity);
         this.angularVelocity += this.angularAcceleration;
         this.rotation += this.angularVelocity;
         
@@ -54,20 +55,24 @@ class Node{
         // Apply gravity
         this.applyForce(fGravity);
         
-        
         for(let i = 0; i < neighbors.length; i++){
-            let relativePosition = p5.Vector.sub(this.position, neighbors[i].position);
+            let relativePositionOfNeighbor = p5.Vector.sub(this.position, neighbors[i].position);
             let velocityDifference = p5.Vector.sub(neighbors[i].velocity, this.velocity);
+            let pRelativeToNeighbor = p5.Vector.mult(velocityDifference, this.mass);
+            console.log("velocity difference: " + velocityDifference);
+            let fFromMomentumRelativeToNeighbor = p5.Vector.div(pRelativeToNeighbor, 100);
 
             // Apply torques (angular accelerations) to other neighbors
             // neighbors[i].applyTorque(fGravity, relativePosition);
             
             // Apply forces to neighbors
-            let fNet = this.calculateNetForce();
-            let fMagnitudeAppliedToNeighbor = fNet.dot(relativePosition);
-            relativePosition.setMag(fMagnitudeAppliedToNeighbor);
-            drawVector(createVector(100, 100), p5.Vector.add(gridOrigin, this.position), BLUE);
-            neighbors[i].applyForce(relativePosition);
+            // let fNet = this.calculateNetForce();
+            let fMagnitudeAppliedToNeighbor = fFromMomentumRelativeToNeighbor.dot(relativePositionOfNeighbor);
+            let vectorToNeighbor = relativePositionOfNeighbor.copy();
+            vectorToNeighbor.setMag(fMagnitudeAppliedToNeighbor);
+            console.log(vectorToNeighbor)
+
+            neighbors[i].applyForce(relativePositionOfNeighbor);
         }
     }
 
