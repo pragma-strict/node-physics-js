@@ -7,3 +7,4 @@ var BG_COL_SHADE_2 = [BG_COL[0] - 2*BG_COL_SHADE_AMT, BG_COL[1] - 2*BG_COL_SHADE
 
 // Basic
 var RED = [216, 41, 41];
+var BLUE = [12, 2, 200];

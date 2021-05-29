@@ -15,6 +15,7 @@ function calculateGravitationalTorque(armLength, mass, angleToHorizontal) {
 
 
 function drawVector(v, origin, color){
-	fill(color);
+	stroke(color);
+	strokeWeight(2);
 	line(origin.x, origin.y, origin.x + v.x, origin.y + v.y);
 }

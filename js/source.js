@@ -128,8 +128,7 @@ function keyPressed()
   }
   if(key == 'd')
   {
-    console.log(gridOrigin.x);
-    console.log(mouseX - previousMouseX);
+    //
   }
   if(key == 'a')
   {

@@ -66,15 +66,17 @@ class Node{
             let fNet = this.calculateNetForce();
             let fMagnitudeAppliedToNeighbor = fNet.dot(relativePosition);
             relativePosition.setMag(fMagnitudeAppliedToNeighbor);
-            drawVector(relativePosition, )
+            drawVector(createVector(100, 100), p5.Vector.add(gridOrigin, this.position), BLUE);
             neighbors[i].applyForce(relativePosition);
         }
     }
 
 
     render(positionOffset, color){
+        noStroke();
         fill(color);
-        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15)
+        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15);
+        drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
     }
 
 
