@@ -62,7 +62,7 @@ function drawFrame()
 
   strokeWeight(0);
   fill(0);
-  text(((mouseX - GRID_X_OFFSET) + ", " + (mouseY - GRID_Y_OFFSET)), mouseX, mouseY);
+  text(((mouseX - gridOrigin.x) + ", " + (mouseY - gridOrigin.y)), mouseX, mouseY);
 
   if(isPlaying)
   {
@@ -81,19 +81,17 @@ function draw()
 {
   drawFrame();
   renderNodeInspector(graph.selected);
-  stroke(RED);
-  strokeWeight(10);
 
   // Mouse dragging logic
   if(!button_checkMouseOver(restartButton) && mouseIsPressed)
   {
     var dx = mouseX - pmouseX; // change in x
     var dy = mouseY - pmouseY; // change in y
-    GRID_X_OFFSET += dx;
-    GRID_Y_OFFSET += dy;
+    gridOrigin.x += dx;
+    gridOrigin.y += dy;
   }
 
-  graph.render(createVector(GRID_X_OFFSET, GRID_Y_OFFSET));
+  graph.render(gridOrigin);
 }
 
 
@@ -130,7 +128,7 @@ function keyPressed()
   }
   if(key == 'd')
   {
-    console.log(GRID_X_OFFSET);
+    console.log(gridOrigin.x);
     console.log(mouseX - previousMouseX);
   }
   if(key == 'a')

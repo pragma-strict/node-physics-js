@@ -1,9 +1,9 @@
 
 var GRID_TILE_SIZE;
 var HALF_GRID_TILE_SIZE;
-var GRID_X_OFFSET;
-var GRID_Y_OFFSET;
 
+
+var gridOrigin;
 var gridHeight;
 var gridWidth;
 
@@ -16,8 +16,7 @@ function setupGrid()
 	HALF_GRID_TILE_SIZE = GRID_TILE_SIZE /2;
 	gridHeight = ceil(height / GRID_TILE_SIZE);
 	gridWidth = ceil(width / GRID_TILE_SIZE);
-	GRID_X_OFFSET = ceil(width/2);
-	GRID_Y_OFFSET = ceil(height - height/6);
+	gridOrigin = createVector(ceil(width/2), ceil(height - height/6));
 }
 
 
@@ -65,8 +64,8 @@ function drawCenterLines()
 {
 	stroke(BG_COL_SHADE_2);
 	strokeWeight(1);
-	line(GRID_X_OFFSET, 0, GRID_X_OFFSET, height);
-	line(0, GRID_Y_OFFSET, width, GRID_Y_OFFSET);
+	line(gridOrigin.x, 0, gridOrigin.x, height);
+	line(0, gridOrigin.y, width, gridOrigin.y);
 }
 
 
@@ -76,8 +75,8 @@ function drawGridLines()
 	// First find the gap between the left-most grid line and the left of the screen. Same for the top.
 	// Then draw the lines from left to right and then from top to bottom, starting at the left-most and top-most pointss.
 
-	var leftGap = abs(GRID_X_OFFSET % GRID_TILE_SIZE);
-	var topGap = abs(GRID_Y_OFFSET % GRID_TILE_SIZE);
+	var leftGap = abs(gridOrigin.x % GRID_TILE_SIZE);
+	var topGap = abs(gridOrigin.y % GRID_TILE_SIZE);
 
 	stroke(BG_COL_SHADE_1);
 	strokeWeight(1);
@@ -97,13 +96,13 @@ function drawGridLines()
 
 function convertScreenToWorldCoordinates(point)
 {
-	return createVector(point.x - GRID_X_OFFSET, point.y - GRID_Y_OFFSET);
+	return createVector(point.x - gridOrigin.x, point.y - gridOrigin.y);
 }
 
 
 function convertWorldToScreenCoordinates(point)
 {
-	return createVector(point.x + GRID_X_OFFSET, point.y + GRID_Y_OFFSET);	
+	return createVector(point.x + gridOrigin.x, point.y + gridOrigin.y);	
 }
 
 

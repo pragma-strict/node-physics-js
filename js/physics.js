@@ -12,3 +12,9 @@ function calculateGravitationalTorque(armLength, mass, angleToHorizontal) {
 	var torque = perpendicularForceComponent * armLength /GRID_TILE_SIZE;
 	return torque;
 }
+
+
+function drawVector(v, origin, color){
+	fill(color);
+	line(origin.x, origin.y, origin.x + v.x, origin.y + v.y);
+}

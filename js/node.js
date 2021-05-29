@@ -53,16 +53,21 @@ class Node{
 
         // Apply gravity
         this.applyForce(fGravity);
-
-        // Apply forces to neighbors
-        for(let i = 0; i < neighbors.length; i++){
-            // let relativePosition = this.position.sub(neighbors[i].position);
-        }
-
-        // Apply torques (angular accelerations) to other neighbors
+        
+        
         for(let i = 0; i < neighbors.length; i++){
             let relativePosition = p5.Vector.sub(this.position, neighbors[i].position);
-            neighbors[i].applyTorque(fGravity, relativePosition);
+            let velocityDifference = p5.Vector.sub(neighbors[i].velocity, this.velocity);
+
+            // Apply torques (angular accelerations) to other neighbors
+            // neighbors[i].applyTorque(fGravity, relativePosition);
+            
+            // Apply forces to neighbors
+            let fNet = this.calculateNetForce();
+            let fMagnitudeAppliedToNeighbor = fNet.dot(relativePosition);
+            relativePosition.setMag(fMagnitudeAppliedToNeighbor);
+            drawVector(relativePosition, )
+            neighbors[i].applyForce(relativePosition);
         }
     }
 
@@ -70,6 +75,12 @@ class Node{
     render(positionOffset, color){
         fill(color);
         ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15)
+    }
+
+
+    // Infer net force acting on node based on its acceleration
+    calculateNetForce(){
+        return p5.Vector.mult(this.acceleration, this.mass);
     }
 
 
