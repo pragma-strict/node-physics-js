@@ -1,3 +1,12 @@
+/*
+    The physics algorithm should go like this:
+    - Every node updates its velocity and position
+    - Every node checks their position relative to neighbors and if the correct edge length is not preserved they must exert forces on each other
+    - The force that will be exerted on each node is the force required to accelerate its neighbor somewhat
+    - I think if we want to implement edges with perfectly fixed length then we should just update the positions of the nodes in some hacky way
+    - If we want to simulate the edges properly then they must not always maintain a fixed length. Remember, everything is kind of like jello. 
+*/
+
 
 // Should hold all information about a node but nothing about graphs and no actual physics calculations
 class Node{
@@ -15,11 +24,9 @@ class Node{
 
     // Calculate a physics step
     tick(deltaTime, neighbors){
-        console.log("ticking: init v:" + this.velocity);
         // Settle forces & accelerations from last tick
         this.velocity.add(this.acceleration);
         this.position.add(this.velocity);
-        console.log("ticking: new v:" + this.velocity);
         this.angularVelocity += this.angularAcceleration;
         this.rotation += this.angularVelocity;
         
@@ -49,31 +56,10 @@ class Node{
             this.acceleration.y = 0;
         }
 
-
         let fGravity = createVector(0, 9.8);
 
         // Apply gravity
         this.applyForce(fGravity);
-        
-        for(let i = 0; i < neighbors.length; i++){
-            let relativePositionOfNeighbor = p5.Vector.sub(this.position, neighbors[i].position);
-            let velocityDifference = p5.Vector.sub(neighbors[i].velocity, this.velocity);
-            let pRelativeToNeighbor = p5.Vector.mult(velocityDifference, this.mass);
-            console.log("velocity difference: " + velocityDifference);
-            let fFromMomentumRelativeToNeighbor = p5.Vector.div(pRelativeToNeighbor, 100);
-
-            // Apply torques (angular accelerations) to other neighbors
-            // neighbors[i].applyTorque(fGravity, relativePosition);
-            
-            // Apply forces to neighbors
-            // let fNet = this.calculateNetForce();
-            let fMagnitudeAppliedToNeighbor = fFromMomentumRelativeToNeighbor.dot(relativePositionOfNeighbor);
-            let vectorToNeighbor = relativePositionOfNeighbor.copy();
-            vectorToNeighbor.setMag(fMagnitudeAppliedToNeighbor);
-            console.log(vectorToNeighbor)
-
-            neighbors[i].applyForce(relativePositionOfNeighbor);
-        }
     }
 
 

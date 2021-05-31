@@ -26,22 +26,22 @@ class Graph{
     }
 
 
+    // <!> Does not check to make sure nodes are actually part of the graph
     addEdge(a, b){
-        let indexA = this.getIndexOf(a);
-        let indexB = this.getIndexOf(b);
-        if(indexA >= 0 && indexB >= 0){
-            this.addEdgeFromIndices(indexA, indexB);
-        }
-        else{
-            console.log("Unable to add edge because one or more nodes were not found in the graph");
-        }
+        this.edges.push(new Edge(a, b, 1));
     }
 
 
-    // Calls tick on all nodes
+    //
     tick(deltaTime){
+        // Update nodes
         for(let i = 0; i < this.nodes.length; i++){
             this.nodes[i].tick(deltaTime, this.getNeighbors(i));
+        }
+
+        // Update edges
+        for(let i = 0; i < this.edges.length; i++){
+            this.edges[i].tick(deltaTime);
         }
     }
 
@@ -66,13 +66,7 @@ class Graph{
 
         // Render edges
         for(let i = 0; i < this.edges.length; i++){
-            stroke(0);
-            strokeWeight(1);
-            let n1 = this.nodes[this.edges[i][0]];
-            let n2 = this.nodes[this.edges[i][1]];
-            let begin = createVector(n1.position.x + originOffset.x, n1.position.y + originOffset.y);
-            let end = createVector(n2.position.x + originOffset.x, n2.position.y + originOffset.y);
-            line(begin.x, begin.y, end.x, end.y);
+            this.edges[i].render(originOffset);
         }
     }
 
