@@ -64,10 +64,14 @@ function drawFrame()
   fill(0);
   text(((mouseX - gridOrigin.x) + ", " + (mouseY - gridOrigin.y)), mouseX, mouseY);
 
+  let displayStatus = "Paused";
+  textAlign(LEFT);
   if(isPlaying)
   {
+    displayStatus = "Ticking";
     tickPhysics();
   }
+  text(displayStatus, 15, height - 25);
 }
 
 
