@@ -28,7 +28,8 @@ class Graph{
 
     // <!> Does not check to make sure nodes are actually part of the graph
     addEdge(a, b){
-        this.edges.push(new Edge(a, b, 1));
+        let defaultEdgeRigidity = 25;
+        this.edges.push(new Edge(a, b, defaultEdgeRigidity));
     }
 
 
