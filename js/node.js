@@ -26,7 +26,7 @@ class Node{
     tick(deltaTime){
         let acceleration = this.netForce.div(this.mass);
         this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
-        this.position.add(this.velocity);
+        this.position.add(p5.Vector.mult(this.velocity, deltaTime));
 
         this.netForce = createVector(); // Force does not accumulate. It is recalculated every tick.
 
@@ -59,7 +59,7 @@ class Node{
             this.netForce.y = 0;
         }
 
-        let fGravity = createVector(0, 9.8);
+        let fGravity = createVector(0, 9.8 * this.mass);
 
         // Apply gravity
         this.applyForce(fGravity);

@@ -78,7 +78,7 @@ function drawFrame()
 // Ticks all the physics things
 function tickPhysics()
 {
-  graph.tick(1/getFrameRate());
+  graph.tick(1/10);
 }
 
 function draw()

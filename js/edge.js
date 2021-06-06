@@ -6,15 +6,26 @@ class Edge{
         this.n2 = n2;
         this.targetLength = n1.position.dist(n2.position);
         this.rigidity = rigidity;
-        this.damping = 0.1; // Fraction of force lost as if due to friction or drag
-        this.forceMagnitude = 0;
+        this.damping = 0.995; // Fraction of force lost as if due to friction or drag
+        this.netForceMag = 0;
     }
 
     tick(deltaTime){
+        // Find force due to springiness of edge
         let lengthError = this.getCurrentLength() - this.targetLength;
-        this.forceMagnitude = lengthError * this.rigidity * (1 - this.damping);
-        let force = p5.Vector.sub(this.n2.position, this.n1.position);
-        force.setMag(this.forceMagnitude);
+        let springForceMag = lengthError * this.rigidity;
+
+        // Find damping force (uses node velocities because it needs to dampen them through application of damp force)
+        let vectorBetween = p5.Vector.sub(this.n2.position, this.n1.position).normalize();
+        let nodeVelocityDifference = p5.Vector.sub(this.n2.velocity, this.n1.velocity);
+        let dampForceMag = vectorBetween.dot(nodeVelocityDifference) * this.damping;
+        
+        // Accumulate net force
+        this.netForceMag = springForceMag + dampForceMag;
+        let force = vectorBetween.copy();
+        force.setMag(this.netForceMag);
+        
+        // Apply forces
         this.n1.applyForce(force);
         force.mult(-1);
         this.n2.applyForce(force);
@@ -33,8 +44,9 @@ class Edge{
         let end = createVector(this.n2.position.x + originOffset.x, this.n2.position.y + originOffset.y);
         line(begin.x, begin.y, end.x, end.y);
 
+        // Draw forces acting on nodes from edge
         let force = p5.Vector.sub(this.n2.position, this.n1.position);
-        force.setMag(this.forceMagnitude);
+        force.setMag(this.netForceMag);
         drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
         force.mult(-1);
         drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
