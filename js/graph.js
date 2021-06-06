@@ -9,14 +9,25 @@ class Graph{
     }
 
     
-    // Add a node to the graph at a given position
+    // Add a node to the graph at a given position unless position is already a node, then join to selected
     addNode(position){
-        let newNode = new Node(position, 10);
-        this.nodes.push(newNode);
-        if(this.selected){
-            this.addEdge(this.selected, newNode);
+        let nodeNearPosition = this.getNodeNearPosition(position, 8);
+        
+        // If adding a node near existing node, connect it to selected node
+        if(nodeNearPosition){
+            if(nodeNearPosition != this.selected){
+                this.addEdge(nodeNearPosition, this.selected);
+            }
+            this.selected = nodeNearPosition;
         }
-        this.selected = newNode;
+        else{
+            let newNode = new Node(position, 10);
+            this.nodes.push(newNode);
+            if(this.selected){
+                this.addEdge(this.selected, newNode);
+            }
+            this.selected = newNode;
+        }
     }
 
 
