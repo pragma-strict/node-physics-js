@@ -17,7 +17,10 @@ class Graph{
         // If adding a node near existing node, connect it to selected node
         if(nodeNearPosition){
             if(nodeNearPosition != this.selected){
-                this.addEdge(nodeNearPosition, this.selected);
+                // let neighbors = this.getNeighbors(this.selected);
+                // if(!neighbors.includes(nodeNearPosition)){
+                    this.addEdge(nodeNearPosition, this.selected);
+                // }
             }
             this.selected = nodeNearPosition;
         }

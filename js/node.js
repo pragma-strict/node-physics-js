@@ -73,8 +73,8 @@ class Node{
         ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15);
         drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
 
-        stroke(0);
-        strokeWeight(0.5);
+        stroke(200);
+        strokeWeight(0.3);
         noFill();
         ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, this.radius*2, this.radius*2);
     }
