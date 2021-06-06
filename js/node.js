@@ -1,11 +1,4 @@
-/*
-    The physics algorithm should go like this:
-    - Every node updates its velocity and position
-    - Every node checks their position relative to neighbors and if the correct edge length is not preserved they must exert forces on each other
-    - The force that will be exerted on each node is the force required to accelerate its neighbor somewhat
-    - I think if we want to implement edges with perfectly fixed length then we should just update the positions of the nodes in some hacky way
-    - If we want to simulate the edges properly then they must not always maintain a fixed length. Remember, everything is kind of like jello. 
-*/
+
 
 
 // Should hold all information about a node but nothing about graphs and no actual physics calculations
