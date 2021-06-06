@@ -28,7 +28,7 @@ class Graph{
 
     // <!> Does not check to make sure nodes are actually part of the graph
     addEdge(a, b){
-        let defaultEdgeRigidity = 25;
+        let defaultEdgeRigidity = 1;
         this.edges.push(new Edge(a, b, defaultEdgeRigidity));
     }
 
@@ -37,7 +37,7 @@ class Graph{
     tick(deltaTime){
         // Update nodes
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].tick(deltaTime, this.getNeighbors(i));
+            this.nodes[i].tick(deltaTime);
         }
 
         // Update edges

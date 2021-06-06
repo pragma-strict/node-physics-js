@@ -14,7 +14,7 @@ class Node{
         this.position = position;
         this.mass = mass;
         this.velocity = createVector(0, 0);
-        this.acceleration = createVector(0, 0);
+        this.netForce = createVector(0, 0);
         this.rotation = 0.0;
         this.angularAcceleration = 0.0;
         this.angularVelocity = 0.0;
@@ -23,37 +23,40 @@ class Node{
 
 
     // Calculate a physics step
-    tick(deltaTime, neighbors){
-        // Settle forces & accelerations from last tick
-        this.velocity.add(this.acceleration);
+    tick(deltaTime){
+        let acceleration = this.netForce.div(this.mass);
+        this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
         this.position.add(this.velocity);
-        this.angularVelocity += this.angularAcceleration;
-        this.rotation += this.angularVelocity;
+
+        this.netForce = createVector(); // Force does not accumulate. It is recalculated every tick.
+
+        // this.angularVelocity += this.angularAcceleration;
+        // this.rotation += this.angularVelocity;
         
 
         // Apply boundaries
         if(this.position.x < -width/2){
             this.position.x = -width/2;
             this.velocity.x *= -this.bounciness;
-            this.acceleration.x = 0;
+            this.netForce.x = 0;
         }
 
         if(this.position.x > width/2){
             this.position.x = width/2;
             this.velocity.x *= -this.bounciness;
-            this.acceleration.x = 0;
+            this.netForce.x = 0;
         }
 
         if(this.position.y < -height/2){
             this.position.y = -height/2;
             this.velocity.y *= -this.bounciness;
-            this.acceleration.y = 0;
+            this.netForce.y = 0;
         }
 
         if(this.position.y > height/2){
             this.position.y = height/2;
             this.velocity.y *= -this.bounciness;
-            this.acceleration.y = 0;
+            this.netForce.y = 0;
         }
 
         let fGravity = createVector(0, 9.8);
@@ -71,21 +74,9 @@ class Node{
     }
 
 
-    // Infer net force acting on node based on its acceleration
-    calculateNetForce(){
-        return p5.Vector.mult(this.acceleration, this.mass);
-    }
-
-
-    // Apply an instantaneous force. i.e. change the velocity directly w/o changing acceleration
-    applyImpulse(force){
-        this.velocity.add(force.div(this.mass));
-    }
-
-
-    // Updates acceleration
+    // 
     applyForce(force){
-        this.acceleration.add(force.div(this.mass));
+        this.netForce.add(force);
     }
 
 
