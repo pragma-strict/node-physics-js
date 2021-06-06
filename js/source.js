@@ -96,6 +96,11 @@ function draw()
   }
 
   graph.render(gridOrigin);
+  
+  // Draw bounds
+  stroke(0);
+  strokeWeight(2);
+  line(-width/2 + gridOrigin.x, height/2 + gridOrigin.y, width/2 + gridOrigin.x, height/2 + gridOrigin.y);
 }
 
 
