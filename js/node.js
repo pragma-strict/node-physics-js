@@ -13,6 +13,7 @@ class Node{
     constructor(position, mass){
         this.position = position;
         this.mass = mass;
+        this.radius = 25;
         this.velocity = createVector(0, 0);
         this.netForce = createVector(0, 0);
         this.rotation = 0.0;
@@ -71,6 +72,11 @@ class Node{
         fill(color);
         ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15);
         drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
+
+        stroke(0);
+        strokeWeight(0.5);
+        noFill();
+        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, this.radius*2, this.radius*2);
     }
 
 

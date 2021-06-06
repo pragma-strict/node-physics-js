@@ -6,12 +6,13 @@ class Graph{
         this.nodes = new Array();
         this.edges = new Array();
         this.selected = null;
+        this.selectionRadius = 25;
     }
 
     
     // Add a node to the graph at a given position unless position is already a node, then join to selected
     addNode(position){
-        let nodeNearPosition = this.getNodeNearPosition(position, 8);
+        let nodeNearPosition = this.getNodeNearPosition(position, this.selectionRadius);
         
         // If adding a node near existing node, connect it to selected node
         if(nodeNearPosition){
@@ -55,6 +56,22 @@ class Graph{
         for(let i = 0; i < this.edges.length; i++){
             this.edges[i].tick(deltaTime);
         }
+
+        // Perform inter-node collision
+        for(let i = 0; i < this.nodes.length; i++){
+            for(let j = 0; j < this.nodes.length; j++){
+                if(i != j){
+                    let n1 = this.nodes[i];
+                    let n2 = this.nodes[j];
+                    let distance = n1.position.dist(n2.position);
+                    if(distance <= (n1.radius + n2.radius)){
+                        let vectorBetween = p5.Vector.sub(n2.position, n1.position);
+                        n1.velocity.reflect(vectorBetween);
+                        n2.velocity.reflect(vectorBetween);
+                    }
+                } 
+            }
+        }
     }
 
 
@@ -86,7 +103,7 @@ class Graph{
     // Naive implementation
     getNodeNearPosition(position, maxDistance){
         for(let i = 0; i < this.nodes.length; i++){
-            if(position.dist(this.nodes[i].position) <= maxDistance){
+            if(this.nodes[i].position.dist(position) <= maxDistance){
                 return this.nodes[i];
             }
         }
@@ -122,6 +139,6 @@ class Graph{
 
     // Update the selected node given a click position
     updateSelected(position){
-        this.selected = this.getNodeNearPosition(position, 8)
+        this.selected = this.getNodeNearPosition(position, this.selectionRadius)
     }
 }
