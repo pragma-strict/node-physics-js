@@ -1,9 +1,16 @@
 
 /*
+TODO:
+- I'm in the middle of moving the graph origin vector to the Graph class instead of the pixel_grid file. 
+  Pixel_grid functions should now be passed the origin after it is accessed from the Graph.
+  There are bugs because the move is not complete. Then the Graph should handle repositioning its own origin when the
+  mouse is dragged as well as dragging specific nodes. When nodes are draggable I can continue working with the angles - 
+  I just needed some more UI capability to be able to test stuff properly.
 
 Roadmap:
 - Implement angular tension or whatever
 - Implement collisions between nodes and edges
+- Add the ability to click and drag the points around so that you can watch them bounce back
 - Make some UI to change the properties of nodes and edges
 - Draw weak edges thinner
 - Do a thorough debug and optimize pass
@@ -25,7 +32,7 @@ var mouseIsPressed = false;
 var restartButton = null;
 var addButton = null;
 
-let graph = new Graph();
+let graph;
 
 function setup() {
   cnv = createCanvas(windowWidth, windowHeight);
@@ -35,6 +42,8 @@ function setup() {
   addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
   angleMode(RADIANS);
   
+  graph = new Graph(createVector(0, 0));
+
   setupGrid();
 }
 
@@ -88,16 +97,7 @@ function draw()
   drawFrame();
   renderNodeInspector(graph.selected);
 
-  // Mouse dragging logic
-  if(!button_checkMouseOver(restartButton) && mouseIsPressed)
-  {
-    var dx = mouseX - pmouseX; // change in x
-    var dy = mouseY - pmouseY; // change in y
-    gridOrigin.x += dx;
-    gridOrigin.y += dy;
-  }
-
-  graph.render(gridOrigin);
+  graph.render();
   
   // Draw bounds
   stroke(0);

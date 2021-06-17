@@ -4,6 +4,8 @@ class Edge{
     constructor(n1, n2, rigidity){
         this.n1 = n1;
         this.n2 = n2;
+        this.n1Angle = n1.rotation + n1.position.angleBetween(n2.position);
+        this.n2Angle = n2.rotation + n2.position.angleBetween(n1.position);
         this.targetLength = n1.position.dist(n2.position);
         this.rigidity = rigidity;
         this.damping = 0.995; // Fraction of force lost as if due to friction or drag
@@ -50,5 +52,11 @@ class Edge{
         drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
         force.mult(-1);
         drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
+
+        // Draw angles from nodes
+        fill(RED);
+        noStroke();
+        text(round(this.n1Angle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
+        // text(this.n1Angle, originOffset.x + this.n2.position.x + 10, originOffset.y + this.n2.position.y - 10);
     }
 }

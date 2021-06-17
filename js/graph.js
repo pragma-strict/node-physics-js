@@ -1,8 +1,9 @@
 
 // Holds a bunch of nodes and calls functions on them. Maybe one day will implement a cool data structure to hold them.
 class Graph{
-    constructor()
+    constructor(originVector)
     {
+        this.origin = originVector;
         this.nodes = new Array();
         this.edges = new Array();
         this.selected = null;
@@ -50,12 +51,12 @@ class Graph{
 
     //
     tick(deltaTime){
-        // Update nodes
+        // Tick nodes
         for(let i = 0; i < this.nodes.length; i++){
             this.nodes[i].tick(deltaTime);
         }
 
-        // Update edges
+        // Tick edges
         for(let i = 0; i < this.edges.length; i++){
             this.edges[i].tick(deltaTime);
         }
@@ -79,21 +80,40 @@ class Graph{
 
 
     // Draw the graph to the screen
-    render(originOffset){
+    render(){
         noStroke();
 
         // Render nodes
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].render(originOffset, 0);
+            this.nodes[i].render(this.origin, 0);
+        }
+
+        // Re-render pre-selected (hovered) node
+        let mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
+        let hoveredNode = this.getNodeNearPosition(mousePosInWorldSpace, this.selectionRadius);
+        if(hoveredNode){
+            hoveredNode.render(this.origin, YELLOW);
+        }
+
+        // Move selected node to mouse position if dragging
+        if(mouseIsPressed && this.selected && hoveredNode === this.selected){
+            this.selected.position.add(createVector(mouseX - pmouseX, mouseY - pmouseY));
+        } 
+        // Otherwise drag the graph itself
+        else{
+            var dx = mouseX - pmouseX; // change in x
+            var dy = mouseY - pmouseY; // change in y
+            this.origin.x += dx;
+            this.origin.y += dy;
         }
 
         // Re-render selected node and neighbors with highlights
         if(this.selected){
             let selectedNeighbors = this.getNeighbors(this.getIndexOf(this.selected));
             for(let i = 0; i < selectedNeighbors.length; i++){
-                selectedNeighbors[i].render(originOffset, color(170, 0, 10));
+                selectedNeighbors[i].render(this.origin, color(170, 0, 10));
             }
-            this.selected.render(originOffset,color(230, 0, 38));
+            this.selected.render(this.origin,color(230, 0, 38));
         }
 
         // Render edges

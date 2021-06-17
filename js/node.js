@@ -39,6 +39,11 @@ class Node{
     }
 
 
+    calculateTorque(deltaTime, neighbors){
+        
+    }
+
+
     render(positionOffset, color){
         noStroke();
         fill(color);
