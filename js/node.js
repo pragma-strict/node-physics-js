@@ -18,37 +18,16 @@ class Node{
 
     // Calculate a physics step
     tick(deltaTime){
+        // Apply acceleration and position
         let acceleration = this.netForce.div(this.mass);
         this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
         this.position.add(p5.Vector.mult(this.velocity, deltaTime));
 
         this.netForce = createVector(); // Force does not accumulate. It is recalculated every tick.
 
-        // this.angularVelocity += this.angularAcceleration;
-        // this.rotation += this.angularVelocity;
-        
-
-        // Apply boundaries
-        if(this.position.x < -width/2){
-            this.position.x = -width/2;
-            this.velocity.x *= -this.bounciness;
-            this.netForce.x = 0;
-        }
-
-        if(this.position.x > width/2){
-            this.position.x = width/2;
-            this.velocity.x *= -this.bounciness;
-            this.netForce.x = 0;
-        }
-
-        if(this.position.y < -height/2){
-            this.position.y = -height/2;
-            this.velocity.y *= -this.bounciness;
-            this.netForce.y = 0;
-        }
-
-        if(this.position.y > height/2){
-            this.position.y = height/2;
+        // Apply bottom boundary
+        if(this.position.y > 0){
+            this.position.y = 0;
             this.velocity.y *= -this.bounciness;
             this.netForce.y = 0;
         }

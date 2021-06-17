@@ -1,11 +1,14 @@
 
 /*
 
-TODO:
-- Node should be an actual class and there should be a separate class to handle the graph. Right now node.js does both. 
-- The physics node should probably outsource all of its physics to physics.js by just calling the basic generic functions provided there.
-- Generally, the "plant tree" thing should be decoupled from the idea of a node. 
+Roadmap:
+- Implement angular tension or whatever
 - Implement collisions between nodes and edges
+- Make some UI to change the properties of nodes and edges
+- Draw weak edges thinner
+- Do a thorough debug and optimize pass
+- Implement gravity?
+- Implement basic "plants" which generate some nodes and grow their edges
 
 Notes on coordinate spaces:
 Everything is calculated and handled in "World space".
@@ -99,7 +102,7 @@ function draw()
   // Draw bounds
   stroke(0);
   strokeWeight(2);
-  line(-width/2 + gridOrigin.x, height/2 + gridOrigin.y, width/2 + gridOrigin.x, height/2 + gridOrigin.y);
+  line(-width/2 + gridOrigin.x, 0 + gridOrigin.y, width/2 + gridOrigin.x, 0 + gridOrigin.y);
 }
 
 
