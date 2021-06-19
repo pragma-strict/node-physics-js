@@ -87,7 +87,7 @@ function drawFrame()
 // Ticks all the physics things
 function tickPhysics()
 {
-  graph.tick(1/10);
+  graph.tick(1/30);
 }
 
 
@@ -95,7 +95,7 @@ function draw()
 {
   drawFrame();
   renderNodeInspector(graph.selected);
-  graph.render(createVector(mouseX, mouseY));
+  graph.render();
 }
 
 
@@ -132,7 +132,7 @@ function keyPressed()
   }
   if(key == 'd')
   {
-    //
+    graph.trackSelected();
   }
   if(key == 'a')
   {

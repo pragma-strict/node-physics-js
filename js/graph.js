@@ -9,6 +9,7 @@ class Graph{
         this.selected = null;   // Node that is selected
         this.hovered = null;    // Node that the mouse is over
         this.dragging = null;   // Node being held / dragged
+        this.tracking = null;   // Node that the graph repositions itself to track
         this.selectionRadius = 25;
     }
 
@@ -83,9 +84,13 @@ class Graph{
 
 
     // Draw the graph to the screen
-    render(mousePosition){
-        let mousePosInWorldSpace = this.getPositionRelativeToGrid(mousePosition);
+    render(){
         noStroke();
+
+        if(this.tracking){
+            this.origin.x = width/2 - this.tracking.position.x;
+            this.origin.y = height/2 - this.tracking.position.y;
+        }
 
         // Render nodes
         for(let i = 0; i < this.nodes.length; i++){
@@ -151,6 +156,18 @@ class Graph{
     }
 
 
+    trackSelected(){
+        if(this.selected){
+            this.tracking = this.selected;
+        }
+    }
+
+
+    stopTracking(){
+        this.tracking = null;
+    }
+
+
     // Update the selected node given a worldspace position (does not convert mouse->world space)
     updateSelected(positionInWorldSpace){
         this.selected = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius)
@@ -164,6 +181,8 @@ class Graph{
     
     
     mousePressed(position){
+        this.stopTracking();
+
         let positionInWorldSpace = this.getPositionRelativeToGrid(position);
         this.updateSelected(positionInWorldSpace);
 
