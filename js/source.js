@@ -27,7 +27,6 @@ World space coordinates are translated back into screen space only when everythi
 var cnv;
 
 var isPlaying = true;
-var mouseIsPressed = false;
 
 var restartButton = null;
 var addButton = null;
@@ -42,7 +41,7 @@ function setup() {
   addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
   angleMode(RADIANS);
   
-  graph = new Graph(createVector(0, 0));
+  graph = new Graph(createVector(width/2, height/2));
 
   setupGrid();
 }
@@ -67,13 +66,12 @@ function windowResized() {
 function drawFrame()
 {
   background(BG_COL);
-  drawGridPixelFromWorldCoordinates(convertScreenToWorldCoordinates([mouseX, mouseY]), BG_COL_SHADE_1); // draw hovered pixel
-  drawGridLines();
+  drawGridLines(graph.origin);
   button_draw(restartButton);
 
   strokeWeight(0);
   fill(0);
-  text(((mouseX - gridOrigin.x) + ", " + (mouseY - gridOrigin.y)), mouseX, mouseY);
+  text(((mouseX - graph.origin.x) + ", " + (mouseY - graph.origin.y)), mouseX, mouseY);
 
   let displayStatus = "Paused";
   textAlign(LEFT);
@@ -92,38 +90,33 @@ function tickPhysics()
   graph.tick(1/10);
 }
 
+
 function draw()
 {
   drawFrame();
   renderNodeInspector(graph.selected);
+  graph.render(createVector(mouseX, mouseY));
+}
 
-  graph.render();
-  
-  // Draw bounds
-  stroke(0);
-  strokeWeight(2);
-  line(-width/2 + gridOrigin.x, 0 + gridOrigin.y, width/2 + gridOrigin.x, 0 + gridOrigin.y);
+
+function mouseMoved(){
+  graph.mouseMoved(createVector(mouseX, mouseY));
 }
 
 
 function mousePressed()
 {
-  mouseIsPressed = true;  // log mouse press
-
-  if(button_checkMouseOver(restartButton))  // button - restart sim
-  {
-    this.graph = new Graph();
-  }
-
-
-  var mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
-  graph.updateSelected(mousePosInWorldSpace);
+  graph.mousePressed(createVector(mouseX, mouseY));
 }
 
 
-function mouseReleased()
-{
-  mouseIsPressed = false;
+function mouseReleased(){
+  graph.mouseReleased();
+}
+
+
+function mouseDragged(){
+  graph.mouseDragged(createVector(mouseX - pmouseX, mouseY - pmouseY));
 }
 
 
@@ -143,7 +136,6 @@ function keyPressed()
   }
   if(key == 'a')
   {
-    let mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
-    graph.addNode(mousePosInWorldSpace);
+    graph.addNode(createVector(mouseX, mouseY));
   }
 }

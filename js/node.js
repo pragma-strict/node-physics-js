@@ -4,6 +4,7 @@
 // Should hold all information about a node but nothing about graphs and no actual physics calculations
 class Node{
     constructor(position, mass){
+        this.bShouldTick = true;
         this.position = position;
         this.mass = mass;
         this.radius = 25;
@@ -18,6 +19,10 @@ class Node{
 
     // Calculate a physics step
     tick(deltaTime){
+        if(!this.bShouldTick){
+            return;
+        }
+        
         // Apply acceleration and position
         let acceleration = this.netForce.div(this.mass);
         this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
@@ -44,16 +49,16 @@ class Node{
     }
 
 
-    render(positionOffset, color){
+    render(gridOrigin, color){
         noStroke();
         fill(color);
-        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, 15, 15);
+        ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, 15, 15);
         drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
 
         stroke(200);
         strokeWeight(0.3);
         noFill();
-        ellipse(positionOffset.x + this.position.x, positionOffset.y + this.position.y, this.radius*2, this.radius*2);
+        ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, this.radius*2, this.radius*2);
     }
 
 

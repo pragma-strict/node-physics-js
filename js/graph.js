@@ -6,13 +6,16 @@ class Graph{
         this.origin = originVector;
         this.nodes = new Array();
         this.edges = new Array();
-        this.selected = null;
+        this.selected = null;   // Node that is selected
+        this.hovered = null;    // Node that the mouse is over
+        this.dragging = null;   // Node being held / dragged
         this.selectionRadius = 25;
     }
 
     
     // Add a node to the graph at a given position unless position is already a node, then join to selected
     addNode(position){
+        position = this.getPositionRelativeToGrid(position);
         let nodeNearPosition = this.getNodeNearPosition(position, this.selectionRadius);
         
         // If adding a node near existing node, connect it to selected node
@@ -80,7 +83,8 @@ class Graph{
 
 
     // Draw the graph to the screen
-    render(){
+    render(mousePosition){
+        let mousePosInWorldSpace = this.getPositionRelativeToGrid(mousePosition);
         noStroke();
 
         // Render nodes
@@ -89,36 +93,18 @@ class Graph{
         }
 
         // Re-render pre-selected (hovered) node
-        let mousePosInWorldSpace = convertScreenToWorldCoordinates(createVector(mouseX, mouseY));
-        let hoveredNode = this.getNodeNearPosition(mousePosInWorldSpace, this.selectionRadius);
-        if(hoveredNode){
-            hoveredNode.render(this.origin, YELLOW);
+        if(this.hovered){
+            this.hovered.render(this.origin, YELLOW);
         }
-
-        // Move selected node to mouse position if dragging
-        if(mouseIsPressed && this.selected && hoveredNode === this.selected){
-            this.selected.position.add(createVector(mouseX - pmouseX, mouseY - pmouseY));
-        } 
-        // Otherwise drag the graph itself
-        else{
-            var dx = mouseX - pmouseX; // change in x
-            var dy = mouseY - pmouseY; // change in y
-            this.origin.x += dx;
-            this.origin.y += dy;
-        }
-
+        
         // Re-render selected node and neighbors with highlights
         if(this.selected){
-            let selectedNeighbors = this.getNeighbors(this.getIndexOf(this.selected));
-            for(let i = 0; i < selectedNeighbors.length; i++){
-                selectedNeighbors[i].render(this.origin, color(170, 0, 10));
-            }
             this.selected.render(this.origin,color(230, 0, 38));
         }
 
         // Render edges
         for(let i = 0; i < this.edges.length; i++){
-            this.edges[i].render(originOffset);
+            this.edges[i].render(this.origin);
         }
     }
 
@@ -160,8 +146,52 @@ class Graph{
     }
 
 
-    // Update the selected node given a click position
-    updateSelected(position){
-        this.selected = this.getNodeNearPosition(position, this.selectionRadius)
+    getPositionRelativeToGrid(position){
+        return createVector(position.x - this.origin.x, position.y - this.origin.y);
+    }
+
+
+    // Update the selected node given a worldspace position (does not convert mouse->world space)
+    updateSelected(positionInWorldSpace){
+        this.selected = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius)
+    }
+    
+    
+    mouseMoved(position){
+        let positionInWorldSpace = this.getPositionRelativeToGrid(position);
+        this.hovered = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
+    }
+    
+    
+    mousePressed(position){
+        let positionInWorldSpace = this.getPositionRelativeToGrid(position);
+        this.updateSelected(positionInWorldSpace);
+
+        // Set a node to "dragging" if mouse is over the selected node
+        if(this.selected && this.selected === this.hovered){
+            this.dragging = this.selected;
+            this.dragging.bShouldTick = false;
+        }
+    }
+    
+    
+    mouseReleased(){
+        // Release dragged node
+        if(this.dragging){
+            this.dragging.bShouldTick = true;
+            this.dragging = null;
+        }
+    }
+    
+    
+    // Either move the "dragging" node or move the graph itself
+    mouseDragged(positionDelta){
+        if(this.dragging){
+            this.dragging.position.add(positionDelta);
+        }
+        else{
+            this.origin.x += positionDelta.x;
+            this.origin.y += positionDelta.y;
+        }
     }
 }

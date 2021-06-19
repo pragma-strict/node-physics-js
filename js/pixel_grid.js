@@ -3,7 +3,6 @@ var GRID_TILE_SIZE;
 var HALF_GRID_TILE_SIZE;
 
 
-var gridOrigin;
 var gridHeight;
 var gridWidth;
 
@@ -60,23 +59,23 @@ function drawGridPixelFromWorldCoordinates(point, color)
 
 
 // Draw a cross with its center at 0, 0 in world space
-function drawCenterLines()
+function drawCenterLines(origin)
 {
-	stroke(BG_COL_SHADE_2);
+	stroke(0);
 	strokeWeight(1);
-	line(gridOrigin.x, 0, gridOrigin.x, height);
-	line(0, gridOrigin.y, width, gridOrigin.y);
+	line(origin.x, 0, origin.x, height);
+	line(0, origin.y, width, origin.y);
 }
 
 
 // Draw grid lines aligned with 0, 0 in world space
-function drawGridLines()
+function drawGridLines(origin)
 {
 	// First find the gap between the left-most grid line and the left of the screen. Same for the top.
 	// Then draw the lines from left to right and then from top to bottom, starting at the left-most and top-most pointss.
 
-	var leftGap = abs(gridOrigin.x % GRID_TILE_SIZE);
-	var topGap = abs(gridOrigin.y % GRID_TILE_SIZE);
+	var leftGap = abs(origin.x % GRID_TILE_SIZE);
+	var topGap = abs(origin.y % GRID_TILE_SIZE);
 
 	stroke(BG_COL_SHADE_1);
 	strokeWeight(1);
@@ -90,7 +89,7 @@ function drawGridLines()
 		line(0, i, width, i);
 	}
 	
-	drawCenterLines();
+	drawCenterLines(origin);
 }
 
 
