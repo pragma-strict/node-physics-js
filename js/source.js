@@ -1,13 +1,8 @@
 
 /*
-TODO:
-- I'm in the middle of moving the graph origin vector to the Graph class instead of the pixel_grid file. 
-  Pixel_grid functions should now be passed the origin after it is accessed from the Graph.
-  There are bugs because the move is not complete. Then the Graph should handle repositioning its own origin when the
-  mouse is dragged as well as dragging specific nodes. When nodes are draggable I can continue working with the angles - 
-  I just needed some more UI capability to be able to test stuff properly.
 
 Roadmap:
+- Extend the node inspector apply to angles so its properties can be debugged
 - Implement angular tension or whatever
 - Implement collisions between nodes and edges
 - Add the ability to click and drag the points around so that you can watch them bounce back
@@ -70,8 +65,8 @@ function drawFrame()
   button_draw(restartButton);
 
   strokeWeight(0);
-  fill(0);
-  text(((mouseX - graph.origin.x) + ", " + (mouseY - graph.origin.y)), mouseX, mouseY);
+  // fill(0);
+  // text(((mouseX - graph.origin.x) + ", " + (mouseY - graph.origin.y)), mouseX, mouseY);
 
   let displayStatus = "Paused";
   textAlign(LEFT);

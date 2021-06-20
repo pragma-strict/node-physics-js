@@ -77,4 +77,10 @@ class Node{
             this.angularAcceleration += torqueForce.z / this.mass;
         }
     }
+
+
+    // Return the angle angle between the horizontal, this node, and the given position vector
+    getReferenceAngle(point){
+        return createVector(1, 0).angleBetween(p5.Vector.sub(point, this.position));
+    }
 }
