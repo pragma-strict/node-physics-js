@@ -42,7 +42,7 @@ function renderNodeInspector(node)
 
 		// Current Angle
 		bodyToTextDistance += leading;
-		text("Angular Acceleration: " + node.angularAcceleration, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Net Torque: " + node.netTorque, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Deflection of child
 		bodyToTextDistance += leading;

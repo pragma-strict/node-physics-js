@@ -11,7 +11,9 @@ class Node{
         this.velocity = createVector(0, 0);
         this.netForce = createVector(0, 0);
         this.rotation = 0.0;
-        this.angularAcceleration = 0.0;
+        this.angularRigidity = 200;
+        this.angularDampingFactor = 0.9;
+        this.netTorque = 0.0;
         this.angularVelocity = 0.0;
         this.bounciness = 0.4;
     }
@@ -24,11 +26,12 @@ class Node{
         }
 
         // Apply acceleration and position
-        let acceleration = this.netForce.div(this.mass);
+        let acceleration = p5.Vector.div(this.netForce, this.mass);
         this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
         this.position.add(p5.Vector.mult(this.velocity, deltaTime));
 
-        this.netForce = createVector(); // Force does not accumulate. It is recalculated every tick.
+        // Clear net force
+        this.netForce = createVector(); 
 
         // Apply bottom boundary
         if(this.position.y > 0){
@@ -41,10 +44,18 @@ class Node{
 
         // Apply gravity
         this.applyForce(fGravity);
+
+        // Angular stuff
+        let angularAcceleration = this.netTorque / this.mass;
+        this.angularVelocity += angularAcceleration * deltaTime;
+        this.rotation += this.angularVelocity * deltaTime;
+
+        // Clear torque
+        this.netTorque = 0;
     }
 
 
-    calculateTorque(deltaTime, neighbors){
+    calculateTorque(edge){
         
     }
 
@@ -55,10 +66,18 @@ class Node{
         ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, 15, 15);
         drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
 
+        // Render collision bubble
         stroke(200);
         strokeWeight(0.3);
         noFill();
         ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, this.radius*2, this.radius*2);
+
+        // Render line to show rotation
+        stroke(color);
+        strokeWeight(2);
+        let lineBegin = createVector(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y);
+        let lineEnd = p5.Vector.fromAngle(this.rotation, 20);
+        line(lineBegin.x, lineBegin.y, lineBegin.x + lineEnd.x, lineBegin.y + lineEnd.y);
     }
 
 
@@ -70,11 +89,10 @@ class Node{
     }
 
 
-    // Updates angular acceleration
-    applyTorque(force, relativePosition){
+    // 
+    applyTorque(force){
         if(this.bShouldTick){
-            let torqueForce = relativePosition.cross(force);
-            this.angularAcceleration += torqueForce.z / this.mass;
+            this.netTorque += force;
         }
     }
 

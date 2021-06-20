@@ -6,6 +6,8 @@ class Edge{
         this.n2 = n2;
         this.n1TargetAngle = n1.rotation + n1.getReferenceAngle(n2.position);
         this.n2TargetAngle = n2.rotation + n2.getReferenceAngle(n1.position);
+        this.n1Angle = this.n1TargetAngle;
+        this.n2Angle = this.n2TargetAngle;
         this.targetLength = n1.position.dist(n2.position);
         this.rigidity = rigidity;
         this.damping = 15; // Fraction of force lost as if due to friction or drag
@@ -31,6 +33,54 @@ class Edge{
         this.n1.applyForce(force);
         force.mult(-1);
         this.n2.applyForce(force);
+        
+        this.tickAngular();
+    }
+
+
+    tickAngular(){
+        /*  =====
+              n1 
+            =====  */
+
+        // Find force due to springiness of the node
+        this.n1Angle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
+        let n1AngularDisplacement = this.n1Angle - this.n1TargetAngle;
+        let n1SpringTorque = n1AngularDisplacement * this.n1.angularRigidity;
+
+        // Find damping force
+        let n1Damping = this.n1.angularVelocity * -1 * this.n1.angularDampingFactor;
+        let n1Torque = n1SpringTorque + n1Damping;
+
+        // Apply torque to n1
+        this.n1.applyTorque(n1Torque);
+
+        // Calculate and apply equal and opposite force to n2
+        let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 10;
+        let n2ForceAngle = n1AngularDisplacement >= 0 ? this.n1Angle + PI/2 : this.n1Angle - PI/2;
+        this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
+
+
+        /*  =====
+              n2 
+            =====  */
+
+        // Find force due to springiness of the node
+        this.n2Angle = this.n2.getReferenceAngle(this.n1.position) - this.n2.rotation;
+        let n2AngularDisplacement = this.n2Angle - this.n2TargetAngle;
+        let n2SpringTorque = n2AngularDisplacement * this.n2.angularRigidity;
+
+        // Find damping force
+        let n2Damping = this.n2.angularVelocity * -1 * this.n2.angularDampingFactor;
+        let n2Torque = n2SpringTorque + n2Damping;
+
+        // Apply torque to n1
+        this.n2.applyTorque(n2Torque);
+
+        // Calculate and apply equal and opposite force to n2
+        let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 10;
+        let n1ForceAngle = n2AngularDisplacement >= 0 ? this.n2Angle + PI/2 : this.n2Angle - PI/2;
+        this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
     }
 
 
@@ -42,20 +92,20 @@ class Edge{
         line(begin.x, begin.y, end.x, end.y);
 
         // Draw forces acting on nodes from edge
-        // let force = p5.Vector.sub(this.n2.position, this.n1.position);
-        // force.setMag(this.netForceMag);
-        // drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
-        // force.mult(-1);
-        // drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
+        let force = p5.Vector.sub(this.n2.position, this.n1.position);
+        force.setMag(this.netForceMag);
+        drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
+        force.mult(-1);
+        drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
 
         // Draw target angles from nodes
         fill(RED);
         noStroke();
         text(round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
-        let n1CurrentAngle = this.n1.getReferenceAngle(this.n2.position);
+        let n1CurrentAngle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
         text(round(n1CurrentAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
-        
-        // text(this.n1TargetAngle, originOffset.x + this.n2.position.x + 10, originOffset.y + this.n2.position.y - 10);
+        let n1AngularDisplacement = n1CurrentAngle - this.n1TargetAngle;
+        text(round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
     }
 
 
