@@ -22,7 +22,7 @@ class Node{
         if(!this.bShouldTick){
             return;
         }
-        
+
         // Apply acceleration and position
         let acceleration = this.netForce.div(this.mass);
         this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
@@ -64,13 +64,17 @@ class Node{
 
     // 
     applyForce(force){
-        this.netForce.add(force);
+        if(this.bShouldTick){
+            this.netForce.add(force);
+        }
     }
 
 
     // Updates angular acceleration
     applyTorque(force, relativePosition){
-        let torqueForce = relativePosition.cross(force);
-        this.angularAcceleration += torqueForce.z / this.mass;
+        if(this.bShouldTick){
+            let torqueForce = relativePosition.cross(force);
+            this.angularAcceleration += torqueForce.z / this.mass;
+        }
     }
 }
