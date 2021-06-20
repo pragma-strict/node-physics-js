@@ -87,7 +87,7 @@ function drawFrame()
 // Ticks all the physics things
 function tickPhysics()
 {
-  graph.tick(1/30);
+  graph.tick(1/5);
 }
 
 
