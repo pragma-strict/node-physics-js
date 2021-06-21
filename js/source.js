@@ -2,8 +2,9 @@
 /*
 
 Roadmap:
+- See bug in the way that angular damping is calculated. Would independently calculating drag help?
+- Basically the angular stuff needs a good solid plan and then the plan needs to wipe clean everything that's there.
 - Extend the node inspector apply to angles so its properties can be debugged
-- Implement angular tension or whatever
 - Implement collisions between nodes and edges
 - Add the ability to click and drag the points around so that you can watch them bounce back
 - Make some UI to change the properties of nodes and edges

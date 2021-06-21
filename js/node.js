@@ -11,8 +11,8 @@ class Node{
         this.velocity = createVector(0, 0);
         this.netForce = createVector(0, 0);
         this.rotation = 0.0;
-        this.angularRigidity = 200;
-        this.angularDampingFactor = 0.9;
+        this.angularRigidity = 25;
+        this.angularDampingFactor = 0.9;    // Values 0-1 where 1 is total damping
         this.netTorque = 0.0;
         this.angularVelocity = 0.0;
         this.bounciness = 0.4;
