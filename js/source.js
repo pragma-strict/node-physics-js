@@ -1,8 +1,11 @@
 
 /*
 
+I commented out the rotating nodes for now. That way they'll always be fixed relative to the world and I can work on the torques being propogated through the edges.
+
+I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
+
 Roadmap:
-- Extend the node inspector apply to angles so its properties can be debugged
 - Implement angular tension or whatever
 - Implement collisions between nodes and edges
 - Add the ability to click and drag the points around so that you can watch them bounce back

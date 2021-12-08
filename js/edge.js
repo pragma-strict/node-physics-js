@@ -45,42 +45,63 @@ class Edge{
 
         // Find force due to springiness of the node
         this.n1Angle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
-        let n1AngularDisplacement = this.n1Angle - this.n1TargetAngle;
+        let n1AngularDisplacement = this.n1TargetAngle - this.n1Angle;
         let n1SpringTorque = n1AngularDisplacement * this.n1.angularRigidity;
+        let n2AppliedForceMag = n1SpringTorque / this.n1.mass;
+
+        // Find direction of force to apply to n2
+        // First translate n2 so that n1 is at the origin and store in "r"
+        let r = p5.Vector.sub(this.n2.position, this.n1.position);
+        let rxTemp = r.x;
+        // Then rotate r by 90 degrees in a direction depending on the sign of the torque
+        if(n1SpringTorque > 0){
+            r.x = -r.y;
+            r.y = rxTemp;
+        }
+        else{
+            r.x = r.y;
+            r.y = -rxTemp;
+        }
+        r.normalize();
 
         // Find damping force
-        let n1Damping = this.n1.angularVelocity * -1 * this.n1.angularDampingFactor;
-        let n1Torque = n1SpringTorque + n1Damping;
+        let n2DampingMag = this.n1.angularDampingFactor * p5.Vector.dot(r, this.n2.velocity);
+
+        // Apply force to n2
+        r.setMag(n2AppliedForceMag - n2DampingMag);
+        this.n2.applyForce(r);
+
+        
 
         // Apply torque to n1
-        this.n1.applyTorque(n1Torque);
+        // this.n1.applyTorque(n1Torque);
 
         // Calculate and apply equal and opposite force to n2
-        let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 10;
-        let n2ForceAngle = n1AngularDisplacement >= 0 ? this.n1Angle + PI/2 : this.n1Angle - PI/2;
-        this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
+        // let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 10;
+        // let n2ForceAngle = n1AngularDisplacement >= 0 ? this.n1Angle + PI/2 : this.n1Angle - PI/2;
+        // this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
 
 
         /*  =====
               n2 
             =====  */
 
-        // Find force due to springiness of the node
-        this.n2Angle = this.n2.getReferenceAngle(this.n1.position) - this.n2.rotation;
-        let n2AngularDisplacement = this.n2Angle - this.n2TargetAngle;
-        let n2SpringTorque = n2AngularDisplacement * this.n2.angularRigidity;
+        // // Find force due to springiness of the node
+        // this.n2Angle = this.n2.getReferenceAngle(this.n1.position) - this.n2.rotation;
+        // let n2AngularDisplacement = this.n2Angle - this.n2TargetAngle;
+        // let n2SpringTorque = n2AngularDisplacement * this.n2.angularRigidity;
 
-        // Find damping force
-        let n2Damping = this.n2.angularVelocity * -1 * this.n2.angularDampingFactor;
-        let n2Torque = n2SpringTorque + n2Damping;
+        // // Find damping force
+        // let n2Damping = this.n2.angularVelocity * -1 * this.n2.angularDampingFactor;
+        // let n2Torque = n2SpringTorque + n2Damping;
 
-        // Apply torque to n1
-        this.n2.applyTorque(n2Torque);
+        // // Apply torque to n1
+        // this.n2.applyTorque(n2Torque);
 
-        // Calculate and apply equal and opposite force to n2
-        let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 10;
-        let n1ForceAngle = n2AngularDisplacement >= 0 ? this.n2Angle + PI/2 : this.n2Angle - PI/2;
-        this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
+        // // Calculate and apply equal and opposite force to n2
+        // let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 10;
+        // let n1ForceAngle = n2AngularDisplacement >= 0 ? this.n2Angle + PI/2 : this.n2Angle - PI/2;
+        // this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
     }
 
 
@@ -101,11 +122,11 @@ class Edge{
         // Draw target angles from nodes
         fill(RED);
         noStroke();
-        text(round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
+        text("Target: " + round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
         let n1CurrentAngle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
-        text(round(n1CurrentAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
-        let n1AngularDisplacement = n1CurrentAngle - this.n1TargetAngle;
-        text(round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
+        text("Current: " + round(n1CurrentAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
+        let n1AngularDisplacement = this.n1TargetAngle - n1CurrentAngle;
+        text("Error: " + round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
     }
 
 

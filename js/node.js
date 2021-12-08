@@ -46,9 +46,9 @@ class Node{
         this.applyForce(fGravity);
 
         // Angular stuff
-        let angularAcceleration = this.netTorque / this.mass;
-        this.angularVelocity += angularAcceleration * deltaTime;
-        this.rotation += this.angularVelocity * deltaTime;
+        //let angularAcceleration = this.netTorque / this.mass;
+        //this.angularVelocity += angularAcceleration * deltaTime;
+        //this.rotation += this.angularVelocity * deltaTime;
 
         // Clear torque
         this.netTorque = 0;
