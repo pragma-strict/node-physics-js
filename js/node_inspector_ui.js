@@ -22,31 +22,31 @@ function renderNodeInspector(node)
 		textSize(16);
 		
 		// Position text
-		text("World position: " + round(node.position.x) + ", " + round(node.position.y), leftScreenBuffer, topScreenBuffer + headerGap);
+		text("World position: " + node.position.x.toFixed(2) + ", " + node.position.y.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap);
 
 		// Mass text
 		bodyToTextDistance += leading;
-		text("Mass: " + round(node.mass), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Mass: " + node.mass.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 		
 		// Torque
 		bodyToTextDistance += leading;
-		text("Velocity: " + node.velocity, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Velocity: " + node.velocity.x.toFixed(2) + ", " + node.velocity.y.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 		
 		// Tension
-		bodyToTextDistance += leading;
-		text("Accleration: " + node.acceleration, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		// bodyToTextDistance += leading;
+		// text("Accleration: " + node.acceleration.x.toFixed(2) + ", " + node.acceleration.y.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Original Angle
 		bodyToTextDistance += leading;
-		text("Angular Velocity: " + node.angularVelocity, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Angular Velocity: " + node.angularVelocity.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Current Angle
 		bodyToTextDistance += leading;
-		text("Net Torque: " + node.netTorque, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Net Torque: " + node.netTorque.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 
 		// Deflection of child
 		bodyToTextDistance += leading;
-		text("Rotation: " + node.rotation, leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
+		text("Rotation: " + node.rotation.toFixed(2), leftScreenBuffer, topScreenBuffer + headerGap + bodyToTextDistance);
 	}
 	else
 	{

@@ -53,7 +53,7 @@ class Graph{
     }
 
 
-    //
+    // Do physics operations every frame
     tick(deltaTime){
         // Tick nodes
         for(let i = 0; i < this.nodes.length; i++){

@@ -11,7 +11,7 @@ class Node{
         this.velocity = createVector(0, 0);
         this.netForce = createVector(0, 0);
         this.rotation = 0.0;
-        this.angularRigidity = 25;
+        this.angularRigidity = 1;
         this.angularDampingFactor = 0.9;    // Values 0-1 where 1 is total damping
         this.netTorque = 0.0;
         this.angularVelocity = 0.0;
@@ -45,10 +45,10 @@ class Node{
         // Apply gravity
         this.applyForce(fGravity);
 
-        // Angular stuff
-        let angularAcceleration = this.netTorque / this.mass;
-        this.angularVelocity += angularAcceleration * deltaTime;
-        this.rotation += this.angularVelocity * deltaTime;
+        // Angular stuff - this is probably calculated wrong
+        // let angularAcceleration = this.netTorque / this.mass;
+        // this.angularVelocity += angularAcceleration * deltaTime;
+        // this.rotation += this.angularVelocity * deltaTime;
 
         // Clear torque
         this.netTorque = 0;

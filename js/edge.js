@@ -20,6 +20,8 @@ class Edge{
         this.netForceMag = 0;
     }
 
+
+    // Do physics every frame
     tick(deltaTime){
         // Find force due to springiness of edge
         let lengthError = this.getCurrentLength() - this.targetLength;
@@ -40,13 +42,22 @@ class Edge{
         force.mult(-1);
         this.n2.applyForce(force);
         
-        this.tickAngular();
+        // this.tickAngular();
     }
 
 
+    /*
+        This function is supposed to apply forces to the nodes on each end of the edge in such a way that would 
+        help the node reach its target rotation relative to the edge. I'm not really even sure if this makes sense
+        since the node should just as well rotate relative to the edge. Only when a node is held still should its
+        springiness relative to the edge actually cause a force to be applied to the other node. Need we measure and
+        store the rotation of nodes at all or can we just consider the angles of edges relative to each other?
+    */
     tickAngular(){
-        //this.updateAngles();
-        
+    /*
+        Note: Linear force applications are temporarily disabled while I'm debugging the torque. 
+        I'm still not really sure what's wrong with it but they shouldn't be going super spinny!
+    */        
         /*  =====
               n1 
             =====  */
@@ -56,7 +67,8 @@ class Edge{
 
         // Find damping force
         let n1DampingDirection = this.n1.velocity.dot(this.n1Angle + PI / 2) >= 0 ? -1 : 1;
-        let n1Torque = n1SpringTorque * (1 - this.n1.angularDampingFactor) * n1DampingDirection;
+        let n1DampingForce = this.n1.angularDampingFactor * n1DampingDirection;
+        let n1Torque = n1SpringTorque + n1DampingForce;
 
         // Apply torque to n1
         this.n1.applyTorque(n1Torque);
@@ -64,7 +76,7 @@ class Edge{
         // Calculate and apply equal and opposite force to n2
         let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 1500;
         let n2ForceAngle = this.n1AngularDisplacement >= 0 ? this.n1Angle - PI/2 : this.n1Angle + PI/2;
-        this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
+        //this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
         // console.log("applying force: " + p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
 
 
@@ -76,9 +88,9 @@ class Edge{
         let n2SpringTorque = -1 * this.n2AngularDisplacement * this.n2.angularRigidity;
 
         // Find damping force
-        // There is a bug in the way that damping is done because the angular velocity of n2 says nothing about the actual velocity of n1
         let n2DampingDirection = this.n2.velocity.dot(this.n2Angle + PI / 2) >= 0 ? -1 : 1;
-        let n2Torque = n2SpringTorque * (1 - this.n2.angularDampingFactor) * n2DampingDirection;
+        let n2DampingForce = this.n2.angularDampingFactor * n2DampingDirection;
+        let n2Torque = n2SpringTorque + n2DampingForce;
 
         // Apply torque to n1
         this.n2.applyTorque(n2Torque);
@@ -86,23 +98,18 @@ class Edge{
         // Calculate and apply equal and opposite force to n2
         let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 1500;
         let n1ForceAngle = this.n2AngularDisplacement >= 0 ? this.n2Angle - PI/2 : this.n2Angle + PI/2;
-        this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
+        //this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
     }
 
 
-    // 
+    // Update base angle, reference angle, current angle and angular displacement for both nodes 
     updateAngles(){
         let newRefAngleN1 = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
         if(this.n1ReferenceAngle > PI/2 && newRefAngleN1 < -PI/2){
             this.n1BaseAngle += (2 * PI);
-            console.log("new n1 base angle: " + this.n1BaseAngle);
         }
         else if(this.n1ReferenceAngle < -PI/2 && newRefAngleN1 > PI/2){
             this.n1BaseAngle -= (2 * PI);
-            console.log("new n1 base angle: " + this.n1BaseAngle);
-        }
-        else{
-            // console.log("not updating n1 base angle");
         }
         this.n1ReferenceAngle = newRefAngleN1;
         this.n1Angle = this.n1ReferenceAngle + this.n1BaseAngle;
@@ -111,14 +118,9 @@ class Edge{
         let newRefAngleN2 = this.n2.getReferenceAngle(this.n1.position) - this.n2.rotation;
         if(this.n2ReferenceAngle > PI/2 && newRefAngleN2 < -PI/2){
             this.n2BaseAngle += (2 * PI);
-            console.log("new n2 base angle: " + this.n1BaseAngle);
         }
         else if(this.n2ReferenceAngle < -PI/2 && newRefAngleN2 > PI/2){
             this.n2BaseAngle -= (2 * PI);
-            console.log("new n2 base angle: " + this.n1BaseAngle);
-        }
-        else{
-            // console.log("not updating n2 base angle");
         }
         this.n2ReferenceAngle = newRefAngleN2;
         this.n2Angle = this.n2ReferenceAngle + this.n2BaseAngle;
@@ -145,10 +147,9 @@ class Edge{
         fill(RED);
         noStroke();
         text(round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
-        //this.updateAngles();
         text(round(this.n1Angle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
         let n1AngularDisplacement = this.n1TargetAngle - this.n1Angle;
-        text(round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
+        text(round(this.n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
     }
 
 
