@@ -6,7 +6,7 @@ class Node{
     constructor(position, mass){
         this.mass = mass;
         this.edges = [];
-        this.edgeTargetAngles = []; // This could also reasonably be stored on the edges
+        this.edgeTargetAngles = []; // To find and maintain the relative angles of edges to each other 
         this.radius = 25;
         this.position = position;
         this.velocity = createVector(0, 0);
@@ -55,7 +55,7 @@ class Node{
         // this.rotation += this.angularVelocity * deltaTime;
 
         // Clear torque
-        this.netTorque = 0;
+        // this.netTorque = 0;
     }
     
     
@@ -120,10 +120,20 @@ class Node{
         return this.getReferenceAngle(edgeIndex.getIncidentNode(this).position);
     }
 
+
+    getReferenceAngleToNode(node){
+        return this.getReferenceAngle(node.position);
+    }
+
     
     // Return the angle angle between the horizontal, this node, and the given position vector
     // TODO: Not sure whether this works
     getReferenceAngle(point){
         return createVector(1, 0).angleBetween(p5.Vector.sub(point, this.position));
+    }
+
+
+    getEdgeCount(){
+        return this.edges.length;
     }
 }

@@ -48,8 +48,6 @@ class Graph{
             let defaultEdgeRigidity = 75;
             let newEdge = new Edge(a, b, defaultEdgeRigidity);
             this.edges.push(newEdge);
-            a.addEdge(newEdge);
-            b.addEdge(newEdge);
         }
     }
 

@@ -9,6 +9,8 @@ class Edge{
         this.damping = 15; // Fraction of force lost as if due to friction or drag
         this.netForceMag = 0;
         
+        this.connectNodes();
+
         // To be deprecated
         this.n1TargetAngle = n1.getReferenceAngle(n2.position) - n1.rotation;
         this.n2TargetAngle = n2.getReferenceAngle(n1.position) - n2.rotation;
@@ -20,6 +22,29 @@ class Edge{
         this.n2Angle = this.n2TargetAngle;
         this.n1AngularDisplacement = 0;     // The difference between the target angle and the actual angle
         this.n2AngularDisplacement = 0;
+    }
+
+
+    // Connect incident nodes by updating their properties i.e. add the edge and relative angles to them 
+    connectNodes(){
+        this.n1.addEdge(this);
+        this.n2.addEdge(this);
+        
+        // Set up relative edge angle(s) on n1 if necessary
+        if(this.n1.getEdgeCount() == 1){
+            this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n2));
+        }
+        if(this.n1.getEdgeCount() >= 1){
+            this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n1.edges[0].getIncidentNode(this.n1)));
+        }
+
+        // Set up relative edge angle(s) on n2 if necessary
+        if(this.n2.getEdgeCount() == 1){
+            this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n2));
+        }
+        if(this.n2.getEdgeCount() >= 1){
+            this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n2.edges[0].getIncidentNode(this.n2)));
+        }
     }
 
 
