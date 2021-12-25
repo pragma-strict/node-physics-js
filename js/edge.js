@@ -71,7 +71,7 @@ class Edge{
         let n1Torque = n1SpringTorque + n1DampingForce;
 
         // Apply torque to n1
-        this.n1.applyTorque(n1Torque);
+        // this.n1.applyTorque(n1Torque);
 
         // Calculate and apply equal and opposite force to n2
         let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 1500;
@@ -92,8 +92,8 @@ class Edge{
         let n2DampingForce = this.n2.angularDampingFactor * n2DampingDirection;
         let n2Torque = n2SpringTorque + n2DampingForce;
 
-        // Apply torque to n1
-        this.n2.applyTorque(n2Torque);
+        // // Apply torque to n1
+        // this.n2.applyTorque(n2Torque);
 
         // Calculate and apply equal and opposite force to n2
         let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 1500;
@@ -146,10 +146,11 @@ class Edge{
         // Draw target angles from nodes
         fill(RED);
         noStroke();
-        text(round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
-        text(round(this.n1Angle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
-        let n1AngularDisplacement = this.n1TargetAngle - this.n1Angle;
-        text(round(this.n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
+        text("Target: " + round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
+        let n1CurrentAngle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
+        text("Current: " + round(n1CurrentAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
+        let n1AngularDisplacement = this.n1TargetAngle - n1CurrentAngle;
+        text("Error: " + round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
     }
 
 

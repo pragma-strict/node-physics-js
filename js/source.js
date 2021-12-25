@@ -1,6 +1,10 @@
 
 /*
 
+I commented out the rotating nodes for now. That way they'll always be fixed relative to the world and I can work on the torques being propogated through the edges.
+
+I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
+
 Roadmap:
 - See bug in the way that angular damping is calculated. Would independently calculating drag help?
 - Basically the angular stuff needs a good solid plan and then the plan needs to wipe clean everything that's there.
