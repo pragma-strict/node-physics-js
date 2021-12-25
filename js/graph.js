@@ -4,7 +4,7 @@ class Graph{
     constructor(originVector)
     {
         this.origin = originVector;
-        this.nodes = new Array();
+        this.nodes = new Array();   // Nodes & edge refs are stored here AND in the nodes & edges themselves
         this.edges = new Array();
         this.selected = null;   // Node that is selected
         this.hovered = null;    // Node that the mouse is over
@@ -14,23 +14,19 @@ class Graph{
     }
 
     
-    // Add a node to the graph at a given position unless position is already a node, then join to selected
-    addNode(position){
-        position = this.getPositionRelativeToGrid(position);
-        let nodeNearPosition = this.getNodeNearPosition(position, this.selectionRadius);
+    // Add a node to the graph at a given world position unless position is already a node, then join to selected
+    addNode(pos){
+        let nodeNearPos = this.getNodeNearPosition(pos, this.selectionRadius);
         
         // If adding a node near existing node, connect it to selected node
-        if(nodeNearPosition){
-            if(nodeNearPosition != this.selected){
-                // let neighbors = this.getNeighbors(this.selected);
-                // if(!neighbors.includes(nodeNearPosition)){
-                    this.addEdge(nodeNearPosition, this.selected);
-                // }
+        if(nodeNearPos){
+            if(nodeNearPos != this.selected){
+                this.addEdge(nodeNearPos, this.selected);
             }
-            this.selected = nodeNearPosition;
+            this.selected = nodeNearPos;
         }
         else{
-            let newNode = new Node(position, 10);
+            let newNode = new Node(pos, 10);
             this.nodes.push(newNode);
             if(this.selected){
                 this.addEdge(this.selected, newNode);
@@ -42,14 +38,19 @@ class Graph{
 
     // Add an edge between nodes at the given indices
     addEdgeFromIndices(indexA, indexB){
-        this.edges.push([indexA, indexB]);
+        this.addEdge(this.nodes[indexA], this.nodes[indexB]);
     }
 
 
-    // <!> Does not check to make sure nodes are actually part of the graph
+    // 
     addEdge(a, b){
-        let defaultEdgeRigidity = 75;
-        this.edges.push(new Edge(a, b, defaultEdgeRigidity));
+        if(this.nodes.includes(a) && this.nodes.includes(b)){   // This check is not efficient
+            let defaultEdgeRigidity = 75;
+            let newEdge = new Edge(a, b, defaultEdgeRigidity);
+            this.edges.push(newEdge);
+            a.addEdge(newEdge);
+            b.addEdge(newEdge);
+        }
     }
 
 
@@ -151,8 +152,13 @@ class Graph{
     }
 
 
-    getPositionRelativeToGrid(position){
-        return createVector(position.x - this.origin.x, position.y - this.origin.y);
+    screenToWorldSpace(screenPos){
+        return createVector(screenPos.x - this.origin.x, screenPos.y - this.origin.y);
+    }
+
+
+    worldToScreenSpace(worldPos){
+        return createVector(worldPos.x + this.origin.x, worldPos.y + this.origin.y);
     }
 
 
@@ -175,7 +181,7 @@ class Graph{
     
     
     mouseMoved(position){
-        let positionInWorldSpace = this.getPositionRelativeToGrid(position);
+        let positionInWorldSpace = this.screenToWorldSpace(position);
         this.hovered = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
     }
     
@@ -183,7 +189,7 @@ class Graph{
     mousePressed(position){
         this.stopTracking();
 
-        let positionInWorldSpace = this.getPositionRelativeToGrid(position);
+        let positionInWorldSpace = this.screenToWorldSpace(position);
         this.updateSelected(positionInWorldSpace);
 
         // Set a node to "dragging" if mouse is over the selected node

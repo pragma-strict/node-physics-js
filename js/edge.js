@@ -4,6 +4,12 @@ class Edge{
     constructor(n1, n2, rigidity){
         this.n1 = n1;
         this.n2 = n2;
+        this.targetLength = n1.position.dist(n2.position);
+        this.rigidity = rigidity;
+        this.damping = 15; // Fraction of force lost as if due to friction or drag
+        this.netForceMag = 0;
+        
+        // To be deprecated
         this.n1TargetAngle = n1.getReferenceAngle(n2.position) - n1.rotation;
         this.n2TargetAngle = n2.getReferenceAngle(n1.position) - n2.rotation;
         this.n1BaseAngle = 0;   // Added to the calculated angle to handle angles > PI and < -PI
@@ -14,10 +20,18 @@ class Edge{
         this.n2Angle = this.n2TargetAngle;
         this.n1AngularDisplacement = 0;     // The difference between the target angle and the actual angle
         this.n2AngularDisplacement = 0;
-        this.targetLength = n1.position.dist(n2.position);
-        this.rigidity = rigidity;
-        this.damping = 15; // Fraction of force lost as if due to friction or drag
-        this.netForceMag = 0;
+    }
+
+
+    // Return the node opposite the given one, or false if the given node isn't from the edge
+    getIncidentNode(node){
+        if(node === this.n1){
+            return this.n2;
+        }
+        if(node === this.n2){
+            return this.n1;
+        }
+        return false;
     }
 
 
@@ -45,61 +59,6 @@ class Edge{
         // this.tickAngular();
     }
 
-
-    /*
-        This function is supposed to apply forces to the nodes on each end of the edge in such a way that would 
-        help the node reach its target rotation relative to the edge. I'm not really even sure if this makes sense
-        since the node should just as well rotate relative to the edge. Only when a node is held still should its
-        springiness relative to the edge actually cause a force to be applied to the other node. Need we measure and
-        store the rotation of nodes at all or can we just consider the angles of edges relative to each other?
-    */
-    tickAngular(){
-    /*
-        Note: Linear force applications are temporarily disabled while I'm debugging the torque. 
-        I'm still not really sure what's wrong with it but they shouldn't be going super spinny!
-    */        
-        /*  =====
-              n1 
-            =====  */
-
-        // Find force due to springiness of the node
-        let n1SpringTorque = -1 * this.n1AngularDisplacement * this.n1.angularRigidity;
-
-        // Find damping force
-        let n1DampingDirection = this.n1.velocity.dot(this.n1Angle + PI / 2) >= 0 ? -1 : 1;
-        let n1DampingForce = this.n1.angularDampingFactor * n1DampingDirection;
-        let n1Torque = n1SpringTorque + n1DampingForce;
-
-        // Apply torque to n1
-        // this.n1.applyTorque(n1Torque);
-
-        // Calculate and apply equal and opposite force to n2
-        let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 1500;
-        let n2ForceAngle = this.n1AngularDisplacement >= 0 ? this.n1Angle - PI/2 : this.n1Angle + PI/2;
-        //this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
-        // console.log("applying force: " + p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
-
-
-        /*  =====
-              n2 
-            =====  */
-
-        // Find force due to springiness of the node
-        let n2SpringTorque = -1 * this.n2AngularDisplacement * this.n2.angularRigidity;
-
-        // Find damping force
-        let n2DampingDirection = this.n2.velocity.dot(this.n2Angle + PI / 2) >= 0 ? -1 : 1;
-        let n2DampingForce = this.n2.angularDampingFactor * n2DampingDirection;
-        let n2Torque = n2SpringTorque + n2DampingForce;
-
-        // // Apply torque to n1
-        // this.n2.applyTorque(n2Torque);
-
-        // Calculate and apply equal and opposite force to n2
-        let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 1500;
-        let n1ForceAngle = this.n2AngularDisplacement >= 0 ? this.n2Angle - PI/2 : this.n2Angle + PI/2;
-        //this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
-    }
 
 
     // Update base angle, reference angle, current angle and angular displacement for both nodes 
@@ -157,4 +116,69 @@ class Edge{
     getCurrentLength(){
         return this.n1.position.dist(this.n2.position);
     }
+
+
+
+
+
+    /* ====================
+               OLD
+    =====================*/
+
+
+
+        /*
+        This function is supposed to apply forces to the nodes on each end of the edge in such a way that would 
+        help the node reach its target rotation relative to the edge. I'm not really even sure if this makes sense
+        since the node should just as well rotate relative to the edge. Only when a node is held still should its
+        springiness relative to the edge actually cause a force to be applied to the other node. Need we measure and
+        store the rotation of nodes at all or can we just consider the angles of edges relative to each other?
+    */
+        tickAngular(){
+            /*
+                Note: Linear force applications are temporarily disabled while I'm debugging the torque. 
+                I'm still not really sure what's wrong with it but they shouldn't be going super spinny!
+            */        
+                /*  =====
+                      n1 
+                    =====  */
+        
+                // Find force due to springiness of the node
+                let n1SpringTorque = -1 * this.n1AngularDisplacement * this.n1.angularRigidity;
+        
+                // Find damping force
+                let n1DampingDirection = this.n1.velocity.dot(this.n1Angle + PI / 2) >= 0 ? -1 : 1;
+                let n1DampingForce = this.n1.angularDampingFactor * n1DampingDirection;
+                let n1Torque = n1SpringTorque + n1DampingForce;
+        
+                // Apply torque to n1
+                // this.n1.applyTorque(n1Torque);
+        
+                // Calculate and apply equal and opposite force to n2
+                let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 1500;
+                let n2ForceAngle = this.n1AngularDisplacement >= 0 ? this.n1Angle - PI/2 : this.n1Angle + PI/2;
+                //this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
+                // console.log("applying force: " + p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
+        
+        
+                /*  =====
+                      n2 
+                    =====  */
+        
+                // Find force due to springiness of the node
+                let n2SpringTorque = -1 * this.n2AngularDisplacement * this.n2.angularRigidity;
+        
+                // Find damping force
+                let n2DampingDirection = this.n2.velocity.dot(this.n2Angle + PI / 2) >= 0 ? -1 : 1;
+                let n2DampingForce = this.n2.angularDampingFactor * n2DampingDirection;
+                let n2Torque = n2SpringTorque + n2DampingForce;
+        
+                // // Apply torque to n1
+                // this.n2.applyTorque(n2Torque);
+        
+                // Calculate and apply equal and opposite force to n2
+                let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 1500;
+                let n1ForceAngle = this.n2AngularDisplacement >= 0 ? this.n2Angle - PI/2 : this.n2Angle + PI/2;
+                //this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
+            }
 }
