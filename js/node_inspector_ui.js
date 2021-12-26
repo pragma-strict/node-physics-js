@@ -12,7 +12,9 @@ class NodeInspectorUI{
 	}
 
 	initDOM(){
-		this.itemElements['pos'] = createElement('p', 'this is the default value');
+		this.itemElements['pos'] = document.createElement('p');
+		this.itemElements['pos'].innerHTML = "this is the fafusu";
+		this.element.appendChild(this.itemElements['pos']);
 	}
 
 	update(){

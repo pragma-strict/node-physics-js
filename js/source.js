@@ -30,45 +30,54 @@ World space coordinates are translated back into screen space only when everythi
 
 */
 
+let ID_PARENT = 'p5-canvas-container';
+let ID_INSPECTOR = 'p5-node-inspector';
+
 var cnv;
 
 var isPlaying = true;
 
-var restartButton = null;
-var addButton = null;
+// var restartButton = null;
+// var addButton = null;
 
 let graph;
 let inspector;
 
 function setup() {
-  cnv = createCanvas(windowWidth, windowHeight);
-  repositionCanvas();
-  
-  restartButton = button_create(width - (width / 10), height/16, width/14, height/14, "Restart Sim");
-  addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
+  initializeP5Canvas();
+  // restartButton = button_create(width - (width / 10), height/16, width/14, height/14, "Restart Sim");
+  // addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
+  updateCanvas();
   angleMode(RADIANS);
   
   graph = new Graph(createVector(width/2, height/2));
 
-  //inspector = new NodeInspectorUI();
+  inspector = new NodeInspectorUI(ID_INSPECTOR);
 
   setupGrid();
 }
 
 
-function repositionCanvas()
+function initializeP5Canvas(){
+  let parentStyle = window.getComputedStyle(document.getElementById(ID_PARENT));
+  canvas = createCanvas(parseInt(parentStyle.width), parseInt(parentStyle.height));
+  worldOrigin = createVector(width/2, height/2);
+  canvas.parent(ID_PARENT);
+}
+
+
+function updateCanvas()
 {
-	var x = windowWidth - width;
-	var y = windowHeight - height;
-	cnv.position(x, y);
+  resizeCanvas(innerWidth, innerHeight);
+  // var x = windowWidth - width;
+	// var y = windowHeight - height;
+	// cnv.position(x, y);
+  // button_updatePosition(restartButton, width - (width / 10), height/ 16);
 }
 
 
 function windowResized() {
-	resizeCanvas(windowWidth, windowHeight);
-	repositionCanvas();
-  button_updatePosition(restartButton, width - (width / 10), height/ 16);
-	drawFrame();
+	updateCanvas();
 }
 
 
@@ -76,7 +85,7 @@ function drawFrame()
 {
   background(BG_COL);
   drawGridLines(graph.origin);
-  button_draw(restartButton);
+  // button_draw(restartButton);
 
   strokeWeight(0);
   // fill(0);
