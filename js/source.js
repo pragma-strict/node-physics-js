@@ -4,6 +4,7 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
+- Finish implementing HTML node inspector
 - Make nodes reference edges so that actual traversals can take place
 - Make nodes store the relative target angles of each edge
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
@@ -37,6 +38,7 @@ var restartButton = null;
 var addButton = null;
 
 let graph;
+let inspector;
 
 function setup() {
   cnv = createCanvas(windowWidth, windowHeight);
@@ -47,6 +49,8 @@ function setup() {
   angleMode(RADIANS);
   
   graph = new Graph(createVector(width/2, height/2));
+
+  //inspector = new NodeInspectorUI();
 
   setupGrid();
 }

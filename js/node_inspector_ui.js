@@ -1,4 +1,27 @@
 
+class NodeInspectorUI{
+	constructor(elementId){
+		this.node;
+		this.element = document.getElementById(elementId);
+		this.itemElements = {};
+		this.initDOM();
+	}
+
+	setNode(node){
+		this.node = node;
+	}
+
+	initDOM(){
+		this.itemElements['pos'] = createElement('p', 'this is the default value');
+	}
+
+	update(){
+		if(this.node){
+			this.itemElements['pos'].html("World position: ");
+		}
+	}
+}
+
 var leftScreenBuffer = 30;	// distance from left of screen to text box in px
 var topScreenBuffer = 50;	// distance from top of screen to text box in px
 var headerGap = 30;
