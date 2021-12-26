@@ -5,6 +5,7 @@ I think I didn't push the function that updates the reference angle properly so 
 
 Roadmap:
 - Finish implementing HTML node inspector
+- For some reason the canvas is larger than the window
 - Make nodes reference edges so that actual traversals can take place
 - Make nodes store the relative target angles of each edge
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
@@ -59,10 +60,11 @@ function setup() {
 
 
 function initializeP5Canvas(){
-  let parentStyle = window.getComputedStyle(document.getElementById(ID_PARENT));
-  canvas = createCanvas(parseInt(parentStyle.width), parseInt(parentStyle.height));
-  worldOrigin = createVector(width/2, height/2);
+  //let parentStyle = window.getComputedStyle(document.getElementById(ID_PARENT));
+  canvas = createCanvas(innerWidth, innerHeight);
+  let originalMainElement = canvas.parent();
   canvas.parent(ID_PARENT);
+  originalMainElement.remove();
 }
 
 
@@ -71,7 +73,7 @@ function updateCanvas()
   resizeCanvas(innerWidth, innerHeight);
   // var x = windowWidth - width;
 	// var y = windowHeight - height;
-	// cnv.position(x, y);
+	// cnv.position(250, 250);
   // button_updatePosition(restartButton, width - (width / 10), height/ 16);
 }
 
