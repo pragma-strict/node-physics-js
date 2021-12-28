@@ -34,7 +34,7 @@ World space coordinates are translated back into screen space only when everythi
 let ID_PARENT = 'p5-canvas-container';
 let ID_INSPECTOR = 'p5-node-inspector';
 
-var cnv;
+var canvas;
 
 var isPlaying = true;
 
@@ -61,7 +61,7 @@ function setup() {
 
 function initializeP5Canvas(){
   //let parentStyle = window.getComputedStyle(document.getElementById(ID_PARENT));
-  canvas = createCanvas(innerWidth, innerHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
   let originalMainElement = canvas.parent();
   canvas.parent(ID_PARENT);
   originalMainElement.remove();
@@ -71,9 +71,9 @@ function initializeP5Canvas(){
 function updateCanvas()
 {
   resizeCanvas(innerWidth, innerHeight);
-  // var x = windowWidth - width;
-	// var y = windowHeight - height;
-	// cnv.position(250, 250);
+  let x = windowWidth - width;
+	let y = windowHeight - height;
+	canvas.position(x, y);
   // button_updatePosition(restartButton, width - (width / 10), height/ 16);
 }
 
@@ -148,7 +148,7 @@ function keyPressed()
   }
   if(key == 'e')
   {
-    tickPhysics();
+    console.log("e pressed. :)")
   }
   if(key == 'd')
   {
