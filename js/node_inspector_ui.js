@@ -15,7 +15,7 @@ class NodeInspectorUI{
 		let titleElement = document.createElement('p');
 		titleElement.innerHTML = "Selected Node Properties";
 		titleElement.style.fontWeight = 'bold';
-		// titleElement.style.color = ;
+		titleElement.style.color = RED;
 		this.wrapperElement.appendChild(titleElement);
 		this.createProperty('mass', 'Mass');
 		this.createProperty('pos', 'World Position');
