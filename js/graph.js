@@ -98,7 +98,7 @@ class Graph{
 
         // Re-render pre-selected (hovered) node
         if(this.hovered){
-            this.hovered.render(this.origin, YELLOW);
+            this.hovered.render(this.origin, ORANGE);
         }
         
         // Re-render selected node and neighbors with highlights

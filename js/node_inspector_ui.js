@@ -1,4 +1,10 @@
+/*
+	Maintains an HTML element to display the values of nodes
 
+	TODO: Don't even store the value ref in the properties, just retrieve them directly from the node when you need them.
+		  I think this would be better because I don't think references to single numbers are actually stored so retrieving
+		  them when needed may be the only way.
+*/
 class NodeInspectorUI{
 	constructor(elementId){
 		this.node;
@@ -17,9 +23,9 @@ class NodeInspectorUI{
 		titleElement.style.fontWeight = 'bold';
 		titleElement.style.color = RED;
 		this.wrapperElement.appendChild(titleElement);
-		this.createProperty('mass', 'Mass');
-		this.createProperty('pos', 'World Position');
-		this.createProperty('vel', 'Velocity');
+		this.createProperty('position', 'World Position');
+		this.createProperty('velocity', 'Velocity');
+		this.createProperty('edgeTargetAngles', 'Edge Target Angles');
 	}
 
 
@@ -27,9 +33,9 @@ class NodeInspectorUI{
 	setNode(node){
 		if(node instanceof Node){
 			this.node = node;
-			this.setPropertyRef('mass', node.mass);
-			this.setPropertyRef('pos', node.position);
-			this.setPropertyRef('vel', node.velocity);
+			Object.keys(this.properties).forEach((key) => {	// Update references to node values for each property
+				this.properties[key].valueRef = node[key];
+			})
 			this.show();
 		}
 		else{
@@ -66,8 +72,16 @@ class NodeInspectorUI{
 		if(property.valueRef instanceof p5.Vector){	// Generate nicely formatted output for vectors
 			innerHTML += "[ " + property.valueRef.x.toFixed(1) + ", " + property.valueRef.y.toFixed(1) + " ]";
 		}
+		else if(property.valueRef instanceof Array){	// Same for arrays
+			innerHTML += "[ ";
+			property.valueRef.forEach((value) => {
+				innerHTML += value.toFixed(1) + ", ";
+			})
+			innerHTML = innerHTML.slice(0, -2);	// Remove the last comma
+			innerHTML += " ]";
+		}
 		else{
-			innerHTML += property.valueRef;	// If not a vector, assume a number
+			innerHTML += property.valueRef;	// Assume value is a number
 		}
 		return innerHTML;
 	}
