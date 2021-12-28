@@ -6,7 +6,9 @@ class Node{
     constructor(position, mass){
         this.mass = mass;
         this.edges = [];
-        this.edgeTargetAngles = []; // To find and maintain the relative angles of edges to each other 
+        this.edgeTargetAngles = []; // To find and maintain the relative angles of edges to each other
+        this.edgeCurrentAngles = [];
+        this.incidentNodeForces = [];   // The force to apply to each incident node
         this.radius = 25;
         this.position = position;
         this.velocity = createVector(0, 0);
@@ -50,9 +52,15 @@ class Node{
         this.applyForce(fGravity);
 
         // Apply perpendicular forces to incident nodes to return their angles to target
-        this.edgeTargetAngles.forEach((angle, i) => {
-            let actualAngle = this.getReferenceAngleToNode(this.edges[i].getIncidentNode(this));
-            
+        this.edgeTargetAngles.forEach((targetAngle, i) => {
+            let otherNode = this.edges[i].getIncidentNode(this);
+            let actualAngle = this.getReferenceAngleToNode(otherNode);
+            this.edgeCurrentAngles[i] = actualAngle;
+            let angleDiff = Geometry.getAngleDifference(targetAngle, actualAngle);
+            let forceToApply = Geometry.getPerpendicularVector(this.position, otherNode.position);
+            forceToApply.setMag(angleDiff * 100);
+            otherNode.applyForce(forceToApply);
+            this.incidentNodeForces[i] = forceToApply;
         })
 
         // Angular stuff - this is probably calculated wrong
@@ -84,6 +92,11 @@ class Node{
         let lineBegin = createVector(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y);
         let lineEnd = p5.Vector.fromAngle(this.rotation, 20);
         line(lineBegin.x, lineBegin.y, lineBegin.x + lineEnd.x, lineBegin.y + lineEnd.y);
+
+        // Render incident node forces
+        this.incidentNodeForces.forEach((force, i) => {
+            drawVector(force, p5.Vector.add(this.position, gridOrigin), GREEN);
+        })
     }
 
     
@@ -103,6 +116,11 @@ class Node{
     calculateTorque(edge){
         
     }
+
+
+    // getIncidentNodeForce(index){
+
+    // }
     
     
     // 

@@ -12,8 +12,8 @@ class Edge{
         this.connectNodes();
 
         // To be deprecated
-        this.n1TargetAngle = n1.getReferenceAngle(n2.position) - n1.rotation;
-        this.n2TargetAngle = n2.getReferenceAngle(n1.position) - n2.rotation;
+        // this.n1TargetAngle = n1.getReferenceAngle(n2.position) - n1.rotation;
+        // this.n2TargetAngle = n2.getReferenceAngle(n1.position) - n2.rotation;
         this.n1BaseAngle = 0;   // Added to the calculated angle to handle angles > PI and < -PI
         this.n2BaseAngle = 0;
         this.n1ReferenceAngle = this.n1TargetAngle;     // Angle in the range -PI < angle < PI
@@ -36,6 +36,8 @@ class Edge{
         }
         if(this.n1.getEdgeCount() >= 2){
             this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n2));
+            this.n1.incidentNodeForces.push(createVector(0, 0));
+            this.n1.edgeCurrentAngles.push(0);
         }
 
         // Set up relative edge angle(s) on n2 if necessary
@@ -44,6 +46,8 @@ class Edge{
         }
         if(this.n2.getEdgeCount() >= 2){
             this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n1));
+            this.n1.incidentNodeForces.push(createVector(0, 0));
+            this.n1.edgeCurrentAngles.push(0);
         }
     }
 
@@ -87,33 +91,33 @@ class Edge{
 
 
     // Update base angle, reference angle, current angle and angular displacement for both nodes 
-    updateAngles(){
-        let newRefAngleN1 = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
-        if(this.n1ReferenceAngle > PI/2 && newRefAngleN1 < -PI/2){
-            this.n1BaseAngle += (2 * PI);
-        }
-        else if(this.n1ReferenceAngle < -PI/2 && newRefAngleN1 > PI/2){
-            this.n1BaseAngle -= (2 * PI);
-        }
-        this.n1ReferenceAngle = newRefAngleN1;
-        this.n1Angle = this.n1ReferenceAngle + this.n1BaseAngle;
-        this.n1AngularDisplacement = this.n1Angle - this.n1TargetAngle;
+    // updateAngles(){
+    //     let newRefAngleN1 = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
+    //     if(this.n1ReferenceAngle > PI/2 && newRefAngleN1 < -PI/2){
+    //         this.n1BaseAngle += (2 * PI);
+    //     }
+    //     else if(this.n1ReferenceAngle < -PI/2 && newRefAngleN1 > PI/2){
+    //         this.n1BaseAngle -= (2 * PI);
+    //     }
+    //     this.n1ReferenceAngle = newRefAngleN1;
+    //     this.n1Angle = this.n1ReferenceAngle + this.n1BaseAngle;
+    //     this.n1AngularDisplacement = this.n1Angle - this.n1TargetAngle;
 
-        let newRefAngleN2 = this.n2.getReferenceAngle(this.n1.position) - this.n2.rotation;
-        if(this.n2ReferenceAngle > PI/2 && newRefAngleN2 < -PI/2){
-            this.n2BaseAngle += (2 * PI);
-        }
-        else if(this.n2ReferenceAngle < -PI/2 && newRefAngleN2 > PI/2){
-            this.n2BaseAngle -= (2 * PI);
-        }
-        this.n2ReferenceAngle = newRefAngleN2;
-        this.n2Angle = this.n2ReferenceAngle + this.n2BaseAngle;
-        this.n2AngularDisplacement = this.n2Angle - this.n2TargetAngle;
-    }
+    //     let newRefAngleN2 = this.n2.getReferenceAngle(this.n1.position) - this.n2.rotation;
+    //     if(this.n2ReferenceAngle > PI/2 && newRefAngleN2 < -PI/2){
+    //         this.n2BaseAngle += (2 * PI);
+    //     }
+    //     else if(this.n2ReferenceAngle < -PI/2 && newRefAngleN2 > PI/2){
+    //         this.n2BaseAngle -= (2 * PI);
+    //     }
+    //     this.n2ReferenceAngle = newRefAngleN2;
+    //     this.n2Angle = this.n2ReferenceAngle + this.n2BaseAngle;
+    //     this.n2AngularDisplacement = this.n2Angle - this.n2TargetAngle;
+    // }
 
 
     render(originOffset){
-        this.updateAngles();
+        // this.updateAngles();
         stroke(0);
         strokeWeight(2);
         let begin = createVector(this.n1.position.x + originOffset.x, this.n1.position.y + originOffset.y);
@@ -128,13 +132,13 @@ class Edge{
         drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
 
         // Draw target angles from nodes
-        fill(RED);
-        noStroke();
-        text("Target: " + round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
-        let n1CurrentAngle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
-        text("Current: " + round(n1CurrentAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
-        let n1AngularDisplacement = this.n1TargetAngle - n1CurrentAngle;
-        text("Error: " + round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
+        // fill(RED);
+        // noStroke();
+        // text("Target: " + round(this.n1TargetAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y - 10);
+        // let n1CurrentAngle = this.n1.getReferenceAngle(this.n2.position) - this.n1.rotation;
+        // text("Current: " + round(n1CurrentAngle, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 5);
+        // let n1AngularDisplacement = this.n1TargetAngle - n1CurrentAngle;
+        // text("Error: " + round(n1AngularDisplacement, 2), originOffset.x + this.n1.position.x + 10, originOffset.y + this.n1.position.y + 20);
     }
 
 

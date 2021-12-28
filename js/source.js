@@ -5,7 +5,7 @@ I think I didn't push the function that updates the reference angle properly so 
 
 Roadmap:
 - Store target angles for each edge in each node and apply forces to correct for errors. This will implement stiffness
-  with a globally fixed rotation.
+with a globally fixed rotation.
 - Reintroduce rotation to nodes and store target angles relative to the node rotation rather than relative to global. 
 - Map displayed vector lengths non-linearly so large values don't go off the screen but small values are still visible
 - Make nodes store the relative target angles of each edge
@@ -27,6 +27,8 @@ Notes on coordinate spaces:
 Everything is calculated and handled in "World space".
 World space is a coordinate plane of the same size as screen space (1:1 pixels) but translated by some x offset and y offset.
 World space coordinates are translated back into screen space only when everything is drawn.
+
+Can you simulate a lava lamp?
 
 */
 
@@ -148,10 +150,9 @@ function keyPressed()
   }
   if(key == 'e')
   {
-    // let a1 = PI - 0.5;
-    // let a2 = -PI + 0.5;
-    // let diff = Geometry.getAngleDifference(a1, a2);
-    // console.log(a1 + " -> " + a2 + " requires a rotation of: " + (-1 * diff));
+    tickPhysics();
+    drawFrame();
+    graph.render();
   }
   if(key == 'd')
   {

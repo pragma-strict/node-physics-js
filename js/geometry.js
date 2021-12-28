@@ -25,6 +25,31 @@ class Geometry{
 		}
         return diff;
     }
+
+
+	// Return a vector pointing 90 degrees to the right of the vector a->b
+	static getPerpendicularVector(a, b){
+		let c = p5.Vector.sub(a, b);
+		let tempX = c.x;
+		c.x = c.y;
+		c.y = -tempX;
+		return c;
+	}
+
+
+	// Return the slope between two points
+	static findSlope(a, b){
+		if(a.x == b.x){
+		return 9999999.00;
+		}
+		return (a.y - b.y) / (a.x - b.x);
+	}
+
+
+	// Return the y-intercept of a line
+	static findIntercept(point, slope){
+		return point.y - point.x * slope;
+	}
 }
 
 

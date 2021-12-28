@@ -26,6 +26,8 @@ class NodeInspectorUI{
 		this.createProperty('position', 'World Position');
 		this.createProperty('velocity', 'Velocity');
 		this.createProperty('edgeTargetAngles', 'Edge Target Angles');
+		this.createProperty('edgeCurrentAngles', 'Current Edge Angles');
+		this.createProperty('incidentNodeForces', 'Incident Node Forces');
 	}
 
 
@@ -70,22 +72,41 @@ class NodeInspectorUI{
 	generateInnerHTMLForProperty(property){
 		let innerHTML = property.title + ": ";
 		if(property.valueRef instanceof p5.Vector){	// Generate nicely formatted output for vectors
-			innerHTML += "[ " + property.valueRef.x.toFixed(1) + ", " + property.valueRef.y.toFixed(1) + " ]";
+			innerHTML += this.getVector2DString(property.valueRef);
 		}
 		else if(property.valueRef instanceof Array){	// Same for arrays
-			innerHTML += "[ ";
-			if(property.valueRef.length >= 1){
-				property.valueRef.forEach((value) => {
-					innerHTML += value.toFixed(1) + ", ";
-				})
-				innerHTML = innerHTML.slice(0, -2);	// Remove the last comma
-			}
-			innerHTML += " ]";
+			innerHTML += this.getArrayString(property.valueRef);
 		}
 		else{
 			innerHTML += property.valueRef;	// Assume value is a number
 		}
 		return innerHTML;
+	}
+
+
+	// Return a nicely formatted string for vectors
+	getVector2DString(vec){
+		return "[ " + vec.x.toFixed(1) + ", " + vec.y.toFixed(1) + " ]";
+	}
+
+
+	// Return a nicely formatted string for arrays
+	getArrayString(arr){
+		let str = "[ ";
+		if(arr.length >= 1){
+			arr.forEach((value) => {
+				if(value instanceof p5.Vector){
+					str += this.getVector2DString(value);
+				}
+				else{
+					str += value.toFixed(1);
+				}
+				str += ", ";
+			})
+			str = str.slice(0, -2);	// Remove the last comma
+		}
+		str += " ]";
+		return str;
 	}
 
 
