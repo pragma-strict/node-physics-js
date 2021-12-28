@@ -49,6 +49,12 @@ class Node{
         // Apply gravity
         this.applyForce(fGravity);
 
+        // Apply perpendicular forces to incident nodes to return their angles to target
+        this.edgeTargetAngles.forEach((angle, i) => {
+            let actualAngle = this.getReferenceAngleToNode(this.edges[i].getIncidentNode(this));
+            
+        })
+
         // Angular stuff - this is probably calculated wrong
         // let angularAcceleration = this.netTorque / this.mass;
         // this.angularVelocity += angularAcceleration * deltaTime;
@@ -122,14 +128,7 @@ class Node{
 
 
     getReferenceAngleToNode(node){
-        return this.getReferenceAngle(node.position);
-    }
-
-    
-    // Return the angle angle between the horizontal, this node, and the given position vector
-    // TODO: Not sure whether this works
-    getReferenceAngle(point){
-        return createVector(1, 0).angleBetween(p5.Vector.sub(point, this.position));
+        return Geometry.getReferenceAngle(node.position);
     }
 
 

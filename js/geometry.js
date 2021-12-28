@@ -1,3 +1,35 @@
+/*
+	Contains static methods for geometric calculations, mostly related to angles for now
+*/
+class Geometry{
+	    
+    // Return the angle angle between the horizontal, this node, and the given position vector
+    // Angle will be negative if in bottom quadrants and positive if in top quadrants (I think)
+    static getReferenceAngle(point){
+        let angleToHorizontal = createVector(1, 0).angleBetween(p5.Vector.sub(point, this.position));
+        if(angleToHorizontal > PI){
+            return -TWO_PI + angleToHorizontal;
+        }
+        return angleToHorizontal;
+    }
+
+
+    // Return the rotation that a2 needs to undergo to become a1
+    static getAngleDifference(a1, a2){
+        let diff = a1 - a2;
+		if(diff > PI){
+			diff = -PI + (diff % PI);
+		}
+		else if(diff < -PI){
+			diff = PI + (diff % PI);
+		}
+        return diff;
+    }
+}
+
+
+
+
 
 // BUG: the first if statement should always be true. this works because sin/cos seem to evaluate to >1 sometimes. This makes no sense.
 // BUG: this function is NOT guaranteed to work 100% of the time!!!

@@ -4,13 +4,13 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
+- Store target angles for each edge in each node and apply forces to correct for errors. This will implement stiffness
+  with a globally fixed rotation.
+- Reintroduce rotation to nodes and store target angles relative to the node rotation rather than relative to global. 
 - Map displayed vector lengths non-linearly so large values don't go off the screen but small values are still visible
-- Make nodes reference edges so that actual traversals can take place
 - Make nodes store the relative target angles of each edge
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
 - Move some of the node information currently stored in edges onto the nodes
-- I think the nodes themselves don't need any notion of rotation. Equal forces will be applied to all edges that are out
-  of alignment.
 
 - See bug in the way that angular damping is calculated. Would independently calculating drag help?
 - Basically the angular stuff needs a good solid plan and then the plan needs to wipe clean everything that's there.
@@ -148,7 +148,10 @@ function keyPressed()
   }
   if(key == 'e')
   {
-    console.log("e pressed. :)")
+    // let a1 = PI - 0.5;
+    // let a2 = -PI + 0.5;
+    // let diff = Geometry.getAngleDifference(a1, a2);
+    // console.log(a1 + " -> " + a2 + " requires a rotation of: " + (-1 * diff));
   }
   if(key == 'd')
   {
