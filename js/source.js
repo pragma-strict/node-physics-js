@@ -5,7 +5,6 @@ I think I didn't push the function that updates the reference angle properly so 
 
 Roadmap:
 - Finish implementing HTML node inspector
-- For some reason the canvas is larger than the window
 - Make nodes reference edges so that actual traversals can take place
 - Make nodes store the relative target angles of each edge
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
@@ -116,6 +115,7 @@ function draw()
   drawFrame();
   renderNodeInspector(graph.selected);
   graph.render();
+  inspector.update();
 }
 
 
@@ -127,6 +127,7 @@ function mouseMoved(){
 function mousePressed()
 {
   graph.mousePressed(createVector(mouseX, mouseY));
+  inspector.setNode(graph.selected);
 }
 
 

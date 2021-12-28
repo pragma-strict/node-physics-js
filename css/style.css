@@ -3,7 +3,7 @@
 }
 
 #p5-node-inspector {
-  display: block;
+  display: none;
   position: absolute;
   z-index: 1;
   background-color: whitesmoke;
