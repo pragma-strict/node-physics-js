@@ -157,5 +157,6 @@ function keyPressed()
   if(key == 'a')
   {
     graph.addNode(graph.screenToWorldSpace(createVector(mouseX, mouseY)));
+    inspector.setNode(graph.selected);
   }
 }
