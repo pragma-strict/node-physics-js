@@ -74,10 +74,12 @@ class NodeInspectorUI{
 		}
 		else if(property.valueRef instanceof Array){	// Same for arrays
 			innerHTML += "[ ";
-			property.valueRef.forEach((value) => {
-				innerHTML += value.toFixed(1) + ", ";
-			})
-			innerHTML = innerHTML.slice(0, -2);	// Remove the last comma
+			if(property.valueRef.length >= 1){
+				property.valueRef.forEach((value) => {
+					innerHTML += value.toFixed(1) + ", ";
+				})
+				innerHTML = innerHTML.slice(0, -2);	// Remove the last comma
+			}
 			innerHTML += " ]";
 		}
 		else{

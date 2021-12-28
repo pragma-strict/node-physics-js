@@ -4,6 +4,7 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
+- Map displayed vector lengths non-linearly so large values don't go off the screen but small values are still visible
 - Make nodes reference edges so that actual traversals can take place
 - Make nodes store the relative target angles of each edge
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
@@ -32,9 +33,9 @@ World space coordinates are translated back into screen space only when everythi
 let ID_PARENT = 'p5-canvas-container';
 let ID_INSPECTOR = 'p5-node-inspector';
 
-var canvas;
+let canvas;
 
-var isPlaying = true;
+let isPlaying = true;
 
 // var restartButton = null;
 // var addButton = null;
