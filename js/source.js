@@ -4,7 +4,6 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
-- Finish implementing HTML node inspector
 - Make nodes reference edges so that actual traversals can take place
 - Make nodes store the relative target angles of each edge
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
@@ -113,7 +112,6 @@ function tickPhysics()
 function draw()
 {
   drawFrame();
-  renderNodeInspector(graph.selected);
   graph.render();
   inspector.update();
 }

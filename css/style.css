@@ -6,13 +6,19 @@
   display: none;
   position: absolute;
   z-index: 1;
+  pointer-events: none;
   background-color: whitesmoke;
+  min-width: 300px;
   margin: 2rem;
-  padding: 1.5rem;
+  padding: 1rem;
   border-width: 1px;
   border-style: solid;
   border-color: #aaa;
   -webkit-box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
           box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#p5-node-inspector p {
+  margin: 0px;
 }
 /*# sourceMappingURL=style.css.map */
