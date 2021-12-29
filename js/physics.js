@@ -1,21 +1,26 @@
 
-var GRAVITATIONAL_CONSTANT = 9.8;
+/*
 
-function calculateGravitationalTorque(armLength, mass, angleToHorizontal) {
-	/*
-	console.log("armLength: " + armLength / GRID_TILE_SIZE);
-	console.log("mass: " + mass);
-	console.log("angleToHorizontal: " + angleToHorizontal);
-	*/
-	var downwardForce = GRAVITATIONAL_CONSTANT * mass;
-	var perpendicularForceComponent = downwardForce * sin(HALF_PI - angleToHorizontal);
-	var torque = perpendicularForceComponent * armLength /GRID_TILE_SIZE;
-	return torque;
-}
+*/
+class Physics{
+	static GRAVITATIONAL_CONSTANT = 9.8;
+
+	static calculateGravitationalTorque(armLength, mass, angleToHorizontal) {
+		// var downwardForce = Physics.GRAVITATIONAL_CONSTANT * mass;
+		// var perpendicularForceComponent = downwardForce * sin(HALF_PI - angleToHorizontal);
+		// var torque = perpendicularForceComponent * armLength /GRID_TILE_SIZE;
+		// return torque;
+	}
 
 
-function drawVector(v, origin, color){
-	stroke(color);
-	strokeWeight(1);
-	line(origin.x, origin.y, origin.x + v.x, origin.y + v.y);
+	// Return the torque exerted by an arm on a point
+	static calculateTorque2D(force, point){
+
+	}
+
+
+	// Return the force exerted on an arm by torque force on a point. Essentially the inverse of torque calculation
+	static calculateForceFromTorque(torque, distance){
+		return torque / distance;
+	}
 }

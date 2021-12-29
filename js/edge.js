@@ -129,9 +129,9 @@ class Edge{
         // Draw forces acting on nodes from edge
         let force = p5.Vector.sub(this.n2.position, this.n1.position);
         force.setMag(this.netForceMag);
-        drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
+        Geometry.drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
         force.mult(-1);
-        drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
+        Geometry.drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
 
         // Draw target angles from nodes
         // fill(RED);

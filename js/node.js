@@ -1,7 +1,11 @@
 
+/*
+    All information about a node but nothing about graphs and no actual physics calculations
 
-
-// Should hold all information about a node but nothing about graphs and no actual physics calculations
+    TODO: 
+        - Fix the bug where inspector says current edge angles are NaN when making a triangle
+        - Combine edge data into a dictionary so the properties of this class aren't so cluttered
+*/
 class Node{
     constructor(position, mass){
         this.mass = mass;
@@ -78,7 +82,7 @@ class Node{
         noStroke();
         fill(color);
         ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, 15, 15);
-        drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
+        Geometry.drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
         
         // Render collision bubble
         stroke(200);
@@ -96,7 +100,7 @@ class Node{
         // Render incident node forces
         this.incidentNodeForces.forEach((force, i) => {
             let incidentNodePosition = this.edges[i].getIncidentNode(this).position;
-            drawVector(force, p5.Vector.add(incidentNodePosition, gridOrigin), GREEN);
+            Geometry.drawVector(force, p5.Vector.add(incidentNodePosition, gridOrigin), GREEN);
         })
     }
 
@@ -117,11 +121,6 @@ class Node{
     calculateTorque(edge){
         
     }
-
-
-    // getIncidentNodeForce(index){
-
-    // }
     
     
     // 

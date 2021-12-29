@@ -59,6 +59,13 @@ class Geometry{
 	static findIntercept(point, slope){
 		return point.y - point.x * slope;
 	}
+
+
+	static drawVector(v, origin, color){
+		stroke(color);
+		strokeWeight(1);
+		line(origin.x, origin.y, origin.x + v.x, origin.y + v.y);
+	}
 }
 
 
