@@ -1,5 +1,10 @@
 
-// Edges maintain references to two nodes and apply forces on them in order to keep them a fixed distance apart
+/* 
+    Edges maintain references to two nodes and apply forces on them in order to keep them a fixed distance apart
+
+    TODO:
+        - May want to consider calculating actual edge length only once and storing it.
+*/
 class Edge{
     constructor(n1, n2, rigidity){
         this.n1 = n1;

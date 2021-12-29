@@ -20,7 +20,7 @@ class Physics{
 
 
 	// Return the force exerted on an arm by torque force on a point. Essentially the inverse of torque calculation
-	static calculateForceFromTorque(torque, distance){
+	static calculateForceOnArm(torque, distance){
 		return torque / distance;
 	}
 }

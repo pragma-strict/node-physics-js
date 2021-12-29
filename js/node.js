@@ -5,6 +5,7 @@
     TODO: 
         - Fix the bug where inspector says current edge angles are NaN when making a triangle
         - Combine edge data into a dictionary so the properties of this class aren't so cluttered
+        - Make a dedicated function to calculate angular force magnitudes with a little more complexity
 */
 class Node{
     constructor(position, mass){
@@ -17,7 +18,7 @@ class Node{
         this.position = position;
         this.velocity = createVector(0, 0);
         this.netForce = createVector(0, 0);
-        this.angularRigidity = 1;
+        this.angularRigidity = 100;
         this.angularDampingFactor = 0.9;    // Values 0-1 where 1 is total damping
         this.netTorque = 0.0;
         this.angularVelocity = 0.0;
@@ -57,12 +58,8 @@ class Node{
         // Apply perpendicular forces to incident nodes to adjust their relative angles
         this.edgeTargetAngles.forEach((targetAngle, i) => {
             let otherNode = this.edges[i].getIncidentNode(this);
-            let referenceAngle = this.getReferenceAngleToNode(otherNode);
-            let actualAngle = Geometry.updateAngle(this.edgeCurrentAngles[i], referenceAngle);
-            this.edgeCurrentAngles[i] = actualAngle;
-            let angleDiff = Geometry.getAngleDifference(targetAngle, actualAngle);
-            let forceToApply = Geometry.getPerpendicularVector(this.position, otherNode.position);
-            forceToApply.setMag(angleDiff * 100);
+            let currentAngle = this.edgeCurrentAngles[i];
+            let forceToApply = this.calcRotationalForceOnNeighbor(otherNode, currentAngle, targetAngle, i);
             otherNode.applyForce(forceToApply);
             this.incidentNodeForces[i] = forceToApply;
         })
@@ -109,6 +106,26 @@ class Node{
     addEdge(edge){
         this.edges.push(edge);
     }
+
+
+    // Return the force to apply to an incident node
+    calcRotationalForceOnNeighbor(neighborNode, currentAngle, targetAngle, index){
+        let referenceAngle = this.getReferenceAngleToNode(neighborNode);
+        let actualAngle = Geometry.updateAngle(currentAngle, referenceAngle);
+        let angularDisplacement = Geometry.getAngleDifference(targetAngle, actualAngle);
+        let forceToApply = Geometry.getPerpendicularVector(this.position, neighborNode.position);
+        let edgeLength = this.edges[index].getCurrentLength();
+        let torqueForceMag = pow(angularDisplacement * this.angularRigidity, 2);
+        let torqueForceDirection = angularDisplacement > 0 ? 1 : -1;
+
+        forceToApply.setMag(torqueForceDirection * Physics.calculateForceOnArm(torqueForceMag, edgeLength));
+
+        this.edgeCurrentAngles[index] = actualAngle;
+        this.incidentNodeForces[index] = forceToApply;
+
+        return forceToApply;
+    }
+
 
 
     // Add a neighbor by creating a new edge
