@@ -14,14 +14,14 @@ class Edge{
         // To be deprecated
         // this.n1TargetAngle = n1.getReferenceAngle(n2.position) - n1.rotation;
         // this.n2TargetAngle = n2.getReferenceAngle(n1.position) - n2.rotation;
-        this.n1BaseAngle = 0;   // Added to the calculated angle to handle angles > PI and < -PI
-        this.n2BaseAngle = 0;
-        this.n1ReferenceAngle = this.n1TargetAngle;     // Angle in the range -PI < angle < PI
-        this.n2ReferenceAngle = this.n2TargetAngle;
-        this.n1Angle = this.n1TargetAngle;  // The actual angle to use
-        this.n2Angle = this.n2TargetAngle;
-        this.n1AngularDisplacement = 0;     // The difference between the target angle and the actual angle
-        this.n2AngularDisplacement = 0;
+        // this.n1BaseAngle = 0;   // Added to the calculated angle to handle angles > PI and < -PI
+        // this.n2BaseAngle = 0;
+        // this.n1ReferenceAngle = this.n1TargetAngle;     // Angle in the range -PI < angle < PI
+        // this.n2ReferenceAngle = this.n2TargetAngle;
+        // this.n1Angle = this.n1TargetAngle;  // The actual angle to use
+        // this.n2Angle = this.n2TargetAngle;
+        // this.n1AngularDisplacement = 0;     // The difference between the target angle and the actual angle
+        // this.n2AngularDisplacement = 0;
     }
 
 
@@ -33,6 +33,7 @@ class Edge{
         // Set up relative edge angle(s) on n1 if necessary
         if(this.n1.getEdgeCount() == 2){
             this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n1.edges[0].getIncidentNode(this.n1)));
+            this.n1.edgeCurrentAngles.push(0);
         }
         if(this.n1.getEdgeCount() >= 2){
             this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n2));
@@ -43,6 +44,7 @@ class Edge{
         // Set up relative edge angle(s) on n2 if necessary
         if(this.n2.getEdgeCount() == 2){
             this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n2.edges[0].getIncidentNode(this.n2)));
+            this.n1.edgeCurrentAngles.push(0);
         }
         if(this.n2.getEdgeCount() >= 2){
             this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n1));

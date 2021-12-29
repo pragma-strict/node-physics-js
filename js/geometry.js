@@ -5,26 +5,37 @@ class Geometry{
 	    
     // Return the angle angle between the horizontal, this node, and the given position vector
     // Angle will be negative if in bottom quadrants and positive if in top quadrants (I think)
-    static getReferenceAngle(point){
-        let angleToHorizontal = createVector(1, 0).angleBetween(p5.Vector.sub(point, this.position));
-        if(angleToHorizontal > PI){
-            return -TWO_PI + angleToHorizontal;
+    static getReferenceAngle(origin, point){
+		let horizontalVector = createVector(1, 0);
+		let vectorToPoint = p5.Vector.sub(point, origin);
+        let refAngle = horizontalVector.angleBetween(vectorToPoint);
+        if(refAngle > PI){
+            return TWO_PI - refAngle;
         }
-        return angleToHorizontal;
+        return -refAngle;
     }
 
 
-    // Return the rotation that a2 needs to undergo to become a1
+    // Return the angle of a1 relative to a2 i.e. a2 minus a1 such that the absolute result is never more than PI
     static getAngleDifference(a1, a2){
-        let diff = a1 - a2;
+        let diff = (a2 - a1) % TWO_PI;
 		if(diff > PI){
 			diff = -PI + (diff % PI);
 		}
 		else if(diff < -PI){
 			diff = PI + (diff % PI);
 		}
-        return diff;
+		// console.log("diff between " + a1 + " and " + a2 + " is: " + (diff % PI));
+        return diff % PI;
     }
+
+
+	// Transform final angle so that it's representation is never more than PI different from initial angle
+	static updateAngle(initial, final){
+		let angleDelta = this.getAngleDifference(initial, final);
+		// console.log("updating angle from " + initial + " to " + final + ": " + (initial + angleDelta));
+		return initial + angleDelta;
+	}
 
 
 	// Return a vector pointing 90 degrees to the right of the vector a->b

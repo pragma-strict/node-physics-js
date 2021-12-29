@@ -54,7 +54,8 @@ class Node{
         // Apply perpendicular forces to incident nodes to return their angles to target
         this.edgeTargetAngles.forEach((targetAngle, i) => {
             let otherNode = this.edges[i].getIncidentNode(this);
-            let actualAngle = this.getReferenceAngleToNode(otherNode);
+            let referenceAngle = this.getReferenceAngleToNode(otherNode);
+            let actualAngle = Geometry.updateAngle(this.edgeCurrentAngles[i], referenceAngle);
             this.edgeCurrentAngles[i] = actualAngle;
             let angleDiff = Geometry.getAngleDifference(targetAngle, actualAngle);
             let forceToApply = Geometry.getPerpendicularVector(this.position, otherNode.position);
@@ -95,7 +96,8 @@ class Node{
 
         // Render incident node forces
         this.incidentNodeForces.forEach((force, i) => {
-            drawVector(force, p5.Vector.add(this.position, gridOrigin), GREEN);
+            let incidentNodePosition = this.edges[i].getIncidentNode(this).position;
+            drawVector(force, p5.Vector.add(incidentNodePosition, gridOrigin), GREEN);
         })
     }
 
@@ -141,12 +143,12 @@ class Node{
 
     // Return the angle between the horizontal, this node, and the given edge
     getEdgeAngle(edgeIndex){
-        return this.getReferenceAngle(edgeIndex.getIncidentNode(this).position);
+        return this.getReferenceAngle(this.position, edgeIndex.getIncidentNode(this).position);
     }
 
 
     getReferenceAngleToNode(node){
-        return Geometry.getReferenceAngle(node.position);
+        return Geometry.getReferenceAngle(this.position, node.position);
     }
 
 

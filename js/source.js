@@ -4,6 +4,8 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
+- For some reason the angle updating function doesn't seem to be giving good results. Test it?
+- We need a way to smoothly update incident node angles so that they don't flip flop between positive and negative
 - Store target angles for each edge in each node and apply forces to correct for errors. This will implement stiffness
 with a globally fixed rotation.
 - Reintroduce rotation to nodes and store target angles relative to the node rotation rather than relative to global. 
@@ -162,5 +164,10 @@ function keyPressed()
   {
     graph.addNode(graph.screenToWorldSpace(createVector(mouseX, mouseY)));
     inspector.setNode(graph.selected);
+  }
+  if(key == 's'){ // 3.1590484285249265 to -3.141134651017797
+    let a1 = 4.0;
+    let a2 = -3.0;
+    console.log(a1 + "->" + a2 + ": " + Geometry.updateAngle(a1, a2));
   }
 }
