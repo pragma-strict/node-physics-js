@@ -25,7 +25,6 @@ class Geometry{
 		else if(diff < -PI){
 			diff = PI + (diff % PI);
 		}
-		// console.log("diff between " + a1 + " and " + a2 + " is: " + (diff % PI));
         return diff % PI;
     }
 
@@ -33,7 +32,6 @@ class Geometry{
 	// Transform final angle so that it's representation is never more than PI different from initial angle
 	static updateAngle(initial, final){
 		let angleDelta = this.getAngleDifference(initial, final);
-		// console.log("updating angle from " + initial + " to " + final + ": " + (initial + angleDelta));
 		return initial + angleDelta;
 	}
 

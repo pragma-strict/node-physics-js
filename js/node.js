@@ -27,31 +27,30 @@ class Node{
 
     // Calculate a physics step
     tick(deltaTime){
-        if(!this.bShouldTick){
-            return;
+        if(this.bShouldTick){
+            // Apply acceleration and position
+            let acceleration = p5.Vector.div(this.netForce, this.mass);
+            this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
+            this.position.add(p5.Vector.mult(this.velocity, deltaTime));
+    
+            // Clear net force
+            this.netForce = createVector(); 
+    
+            // Apply bottom boundary
+            if(this.position.y > 0){
+                this.position.y = 0;
+                this.velocity.y *= -this.bounciness;
+                this.netForce.y = 0;
+            }
+    
+            let fGravity = createVector(0, 9.8 * this.mass);
+    
+            // Apply gravity
+            this.applyForce(fGravity);
         }
 
-        // Apply acceleration and position
-        let acceleration = p5.Vector.div(this.netForce, this.mass);
-        this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
-        this.position.add(p5.Vector.mult(this.velocity, deltaTime));
 
-        // Clear net force
-        this.netForce = createVector(); 
-
-        // Apply bottom boundary
-        if(this.position.y > 0){
-            this.position.y = 0;
-            this.velocity.y *= -this.bounciness;
-            this.netForce.y = 0;
-        }
-
-        let fGravity = createVector(0, 9.8 * this.mass);
-
-        // Apply gravity
-        this.applyForce(fGravity);
-
-        // Apply perpendicular forces to incident nodes to return their angles to target
+        // Apply perpendicular forces to incident nodes to adjust their relative angles
         this.edgeTargetAngles.forEach((targetAngle, i) => {
             let otherNode = this.edges[i].getIncidentNode(this);
             let referenceAngle = this.getReferenceAngleToNode(otherNode);
