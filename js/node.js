@@ -6,6 +6,13 @@
         - Fix the bug where inspector says current edge angles are NaN when making a triangle
         - Combine edge data into a dictionary so the properties of this class aren't so cluttered
         - Make a dedicated function to calculate angular force magnitudes with a little more complexity
+        - Prevent explosions by capping forces applied
+        - Add some kind of damping or prevent infinite gliders or mimic conservation of energy in some other way
+            - Backwards acceleration?
+        - Implement a more standarized unit and scale to help calibrate calculations to realistic levels?
+        - Make angular force calculations relative to local node rotation rather than global reference angle.
+            - Just make an updated version of the ref angle function that calculates relative to a parameter rather than
+              the new (0, 1) vector!
 */
 class Node{
     constructor(position, mass){
