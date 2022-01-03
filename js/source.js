@@ -11,6 +11,7 @@ Roadmap:
 - Make nodes attempt to return edges to target positions by applying forces to incident nodes
 - Move some of the node information currently stored in edges onto the nodes
 
+- Move ticking and associated logic into draw() instead of handling it in drawFrame()
 - See bug in the way that angular damping is calculated. Would independently calculating drag help?
 - Basically the angular stuff needs a good solid plan and then the plan needs to wipe clean everything that's there.
 - Extend the node inspector apply to angles so its properties can be debugged
@@ -107,7 +108,8 @@ function drawFrame()
 // Ticks all the physics things
 function tickPhysics()
 {
-  graph.tick(1/5);
+  let mPosWS = graph.screenToWorldSpace(createVector(mouseX, mouseY));
+  graph.tick(1/5, mPosWS);
 }
 
 
@@ -115,7 +117,7 @@ function draw()
 {
   drawFrame();
   graph.render();
-  inspector.update();
+  inspector.updateDOM();
 }
 
 

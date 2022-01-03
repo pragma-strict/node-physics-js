@@ -62,10 +62,10 @@ class Graph{
 
 
     // Do physics operations every frame
-    tick(deltaTime){
+    tick(deltaTime, mPosWS){
         // Tick nodes
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].tick(deltaTime);
+            this.nodes[i].tick(deltaTime, mPosWS);
         }
 
         // Tick edges
@@ -112,7 +112,7 @@ class Graph{
         
         // Re-render selected node and neighbors with highlights
         if(this.selectedNode){
-            this.selectedNode.render(this.origin,color(230, 0, 38));
+            this.selectedNode.render(this.origin, color(230, 0, 38));
         }
 
         // Render edges

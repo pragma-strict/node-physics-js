@@ -13,18 +13,22 @@
         - Make angular force calculations relative to local node rotation rather than global reference angle.
             - Just make an updated version of the ref angle function that calculates relative to a parameter rather than
               the new (0, 1) vector!
+        - Remove the gridOrigin arg from render()
 */
 class Node{
     constructor(position, mass){
         this.mass = mass;
+        this.position = position;
+        this.rotation = 0.0;
+        this.velocity = createVector(0, 0);
+        this.netForce = createVector(0, 0);
+        
         this.edges = [];
         this.edgeTargetAngles = []; // To find and maintain the relative angles of edges to each other
         this.edgeCurrentAngles = [];
         this.incidentNodeForces = [];   // The force to apply to each incident node
+        
         this.radius = 25;
-        this.position = position;
-        this.velocity = createVector(0, 0);
-        this.netForce = createVector(0, 0);
         this.angularRigidity = 100;
         this.angularDampingFactor = 0.9;    // Values 0-1 where 1 is total damping
         this.netTorque = 0.0;
@@ -32,14 +36,11 @@ class Node{
         this.bounciness = 0.4;
         this.dragStrength = 0.8;    // Higher values -> more drag
         this.bShouldTick = true; 
-
-        // To be deprecated
-        this.rotation = 0.0;
     }
 
 
     // Calculate a physics step
-    tick(deltaTime){
+    tick(deltaTime, mPosWS){
         if(this.bShouldTick){
             // Apply acceleration and position
             let acceleration = p5.Vector.div(this.netForce, this.mass);
@@ -80,6 +81,8 @@ class Node{
 
         // To apply angular drag to nodes, find the component of their velocity relative to neighbors along the arc prescribed by their edge and use it to generate a force in the opposite direction.
 
+        this.rotation = Geometry.getReferenceAngle(this.position, mPosWS);
+
         // Angular stuff - this is probably calculated wrong
         // let angularAcceleration = this.netTorque / this.mass;
         // this.angularVelocity += angularAcceleration * deltaTime;
@@ -88,7 +91,7 @@ class Node{
         // Clear torque
         // this.netTorque = 0;
     }
-    
+
     
     // 
     render(gridOrigin, color){

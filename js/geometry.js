@@ -2,18 +2,24 @@
 	Contains static methods for geometric calculations, mostly related to angles for now
 */
 class Geometry{
-	    
-    // Return the angle angle between the horizontal, this node, and the given position vector
-    // Angle will be negative if in bottom quadrants and positive if in top quadrants (I think)
-    static getReferenceAngle(origin, point){
-		let horizontalVector = createVector(1, 0);
-		let vectorToPoint = p5.Vector.sub(point, origin);
-        let refAngle = horizontalVector.angleBetween(vectorToPoint);
-        if(refAngle > PI){
-            return TWO_PI - refAngle;
-        }
-        return -refAngle;
-    }
+	   
+	// Return the angle between a and b around the origin in the range (0, TWO_PI)
+	static getAngleBetween(origin, a, b){
+		let toA = p5.Vector.sub(a, origin);
+		let toB = p5.Vector.sub(b, origin);
+		return toA.angleBetween(toB);
+	}
+
+
+	// Return the angle angle between the horizontal, this node, and the given position vector
+	// Angle will be negative if in bottom quadrants and positive if in top quadrants (I think)
+	static getReferenceAngle(origin, point){
+		if(origin instanceof p5.Vector && point instanceof p5.Vector){
+			return Geometry.getAngleBetween(origin, createVector(origin.x + 1, origin.y), point);
+		}
+		console.log("<!> One or more params to Geometry.getReferenceAngle are of incorrect type");
+		return null;
+	}
 
 
     // Return the angle of a1 relative to a2 i.e. a2 minus a1 such that the absolute result is never more than PI
@@ -33,6 +39,15 @@ class Geometry{
 	static updateAngle(initial, final){
 		let angleDelta = this.getAngleDifference(initial, final);
 		return initial + angleDelta;
+	}
+
+
+	// Convert an angle in range (0, TWO_PI) to the range (-PI, PI)
+	static clampAngleToPI(angle){
+		if(angle > PI){
+			return angle - TWO_PI;
+		}
+		return angle;
 	}
 
 

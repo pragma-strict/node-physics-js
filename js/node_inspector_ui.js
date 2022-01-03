@@ -2,15 +2,14 @@
 	Maintains an HTML element to display the values of nodes
 
 	TODO: Don't even store the value ref in the properties, just retrieve them directly from the node when you need them.
-		  I think this would be better because I don't think references to single numbers are actually stored so retrieving
-		  them when needed may be the only way.
+	I think this would be better because I don't think references to single numbers are actually stored so retrieving them when needed may be the only way.
 */
 class NodeInspectorUI{
 	constructor(elementId){
 		this.node;
 		this.isVisible = false;
 		this.wrapperElement = document.getElementById(elementId);
-		this.properties = {};	// Properties contain a title, element, and reference to the value to display
+		this.properties = {};	// Properties contain a title and a DOM element
 		
 		this.initDOM();
 	}
@@ -25,6 +24,7 @@ class NodeInspectorUI{
 		this.wrapperElement.appendChild(titleElement);
 		this.createProperty('position', 'World Position');
 		this.createProperty('velocity', 'Velocity');
+		this.createProperty('rotation', 'Rotation');
 		this.createProperty('edgeTargetAngles', 'Edge Target Angles');
 		this.createProperty('edgeCurrentAngles', 'Current Edge Angles');
 		this.createProperty('incidentNodeForces', 'Incident Node Forces');
@@ -51,36 +51,34 @@ class NodeInspectorUI{
 		this.properties[key] = {
 			title: title,
 			element: document.createElement('p'),
-			valueRef: null
 		};
 		this.wrapperElement.appendChild(this.properties[key].element);
 	}
 
 
-	// 
-	update(){
+	// Update the HTML values in the node inspector
+	updateDOM(){
 		if(this.node){
 			Object.keys(this.properties).forEach((key) => {
 				let property = this.properties[key];
-				property.element.innerHTML = this.generateInnerHTMLForProperty(this.properties[key]);
+				let innerHTML = property.title + ": ";	// Start output string
+				let newValue = this.node[key];	// Grab updated value directly from node
+
+				// Generate nicely formatted strings depending on value type
+				if(newValue instanceof p5.Vector){
+					innerHTML += this.getVector2DString(newValue);
+				}
+				else if(newValue instanceof Array){
+					innerHTML += this.getArrayString(newValue);
+				}
+				else{
+					innerHTML += newValue;
+				}
+
+				// Update innerHTML in DOM
+				property.element.innerHTML = innerHTML;
 			})
 		}
-	}
-
-
-	// Return the HTML string to display for a given property
-	generateInnerHTMLForProperty(property){
-		let innerHTML = property.title + ": ";
-		if(property.valueRef instanceof p5.Vector){	// Generate nicely formatted output for vectors
-			innerHTML += this.getVector2DString(property.valueRef);
-		}
-		else if(property.valueRef instanceof Array){	// Same for arrays
-			innerHTML += this.getArrayString(property.valueRef);
-		}
-		else{
-			innerHTML += property.valueRef;	// Assume value is a number
-		}
-		return innerHTML;
 	}
 
 
