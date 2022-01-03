@@ -4,6 +4,7 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
+- Fix the bug that dragged nodes don't stay directly under the cursor
 - For some reason the angle updating function doesn't seem to be giving good results. Test it?
 - We need a way to smoothly update incident node angles so that they don't flip flop between positive and negative
 - Store target angles for each edge in each node and apply forces to correct for errors. This will implement stiffness

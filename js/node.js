@@ -30,7 +30,8 @@ class Node{
         this.netTorque = 0.0;
         this.angularVelocity = 0.0;
         this.bounciness = 0.4;
-        this.bShouldTick = true;
+        this.dragStrength = 0.8;    // Higher values -> more drag
+        this.bShouldTick = true; 
 
         // To be deprecated
         this.rotation = 0.0;
@@ -48,6 +49,12 @@ class Node{
             // Clear net force
             this.netForce = createVector(); 
     
+            // Generate a drag force based on velocity
+            let drag = this.velocity.copy();
+            drag.mult(-1);
+            drag.mult(this.dragStrength);
+            this.applyForce(drag);
+
             // Apply bottom boundary
             if(this.position.y > 0){
                 this.position.y = 0;
