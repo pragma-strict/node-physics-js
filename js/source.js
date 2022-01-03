@@ -127,7 +127,7 @@ function mouseMoved(){
 function mousePressed()
 {
   graph.mousePressed(createVector(mouseX, mouseY));
-  inspector.setNode(graph.selected);
+  inspector.setNode(graph.selectedNode);
 }
 
 
@@ -160,7 +160,7 @@ function keyPressed()
   if(key == 'a')
   {
     graph.addNode(graph.screenToWorldSpace(createVector(mouseX, mouseY)));
-    inspector.setNode(graph.selected);
+    inspector.setNode(graph.selectedNode);
   }
   if(key == 's'){ // 3.1590484285249265 to -3.141134651017797
     let a1 = 4.0;

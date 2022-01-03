@@ -134,7 +134,7 @@ class Node{
         let torqueForceMag = pow(angularDisplacement * this.angularRigidity, 2);
         let torqueForceDirection = angularDisplacement > 0 ? 1 : -1;
 
-        console.log(Physics.calculateForceOnArm(torqueForceMag, edgeLength))
+        // console.log(currentAngle)
         forceToApply.setMag(torqueForceDirection * Physics.calculateForceOnArm(torqueForceMag, edgeLength));
 
         this.edgeCurrentAngles[index] = actualAngle;
