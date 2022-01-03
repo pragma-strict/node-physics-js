@@ -78,6 +78,8 @@ class Node{
             this.incidentNodeForces[i] = forceToApply;
         })
 
+        // To apply angular drag to nodes, find the component of their velocity relative to neighbors along the arc prescribed by their edge and use it to generate a force in the opposite direction.
+
         // Angular stuff - this is probably calculated wrong
         // let angularAcceleration = this.netTorque / this.mass;
         // this.angularVelocity += angularAcceleration * deltaTime;
@@ -132,6 +134,7 @@ class Node{
         let torqueForceMag = pow(angularDisplacement * this.angularRigidity, 2);
         let torqueForceDirection = angularDisplacement > 0 ? 1 : -1;
 
+        console.log(Physics.calculateForceOnArm(torqueForceMag, edgeLength))
         forceToApply.setMag(torqueForceDirection * Physics.calculateForceOnArm(torqueForceMag, edgeLength));
 
         this.edgeCurrentAngles[index] = actualAngle;

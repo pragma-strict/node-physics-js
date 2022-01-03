@@ -4,11 +4,7 @@
 I think I didn't push the function that updates the reference angle properly so you don't get switching between negative and positive. I kind of need that back. 
 
 Roadmap:
-- Fix the bug that dragged nodes don't stay directly under the cursor
-- For some reason the angle updating function doesn't seem to be giving good results. Test it?
-- We need a way to smoothly update incident node angles so that they don't flip flop between positive and negative
-- Store target angles for each edge in each node and apply forces to correct for errors. This will implement stiffness
-with a globally fixed rotation.
+- Add drag for rotational motion (see commend in Node.tick())
 - Reintroduce rotation to nodes and store target angles relative to the node rotation rather than relative to global. 
 - Map displayed vector lengths non-linearly so large values don't go off the screen but small values are still visible
 - Make nodes store the relative target angles of each edge
@@ -141,7 +137,7 @@ function mouseReleased(){
 
 
 function mouseDragged(){
-  graph.mouseDragged(createVector(mouseX - pmouseX, mouseY - pmouseY));
+  graph.mouseDragged(createVector(mouseX, mouseY));
 }
 
 

@@ -1,15 +1,24 @@
 
-// Holds a bunch of nodes and calls functions on them. Maybe one day will implement a cool data structure to hold them.
+/* 
+    Maintains and manages nodes, edges, and the origin of the world. 
+    Maybe one day will implement a cool data structure to hold nodes & edges.
+*/
 class Graph{
     constructor(originVector)
     {
         this.origin = originVector;
         this.nodes = new Array();   // Nodes & edge refs are stored here AND in the nodes & edges themselves
         this.edges = new Array();
-        this.selected = null;   // Node that is selected
-        this.hovered = null;    // Node that the mouse is over
-        this.dragging = null;   // Node being held / dragged
-        this.tracking = null;   // Node that the graph repositions itself to track
+
+        this.isDraggingGraph = false;
+        this.mouseDownPos = null;   // World space position of mouse click relative to origin
+        
+        this.selectedNode = null;   // Node that is selected
+        this.hoveredNode = null;    // Node that the mouse is over
+        this.dragNode = null;   // Node being held / dragged
+        this.dragNodeOrigin = null;  // Position of dragged node before it was grabbed
+        this.trackingNode = null;   // Node that the graph repositions itself to track
+        
         this.selectionRadius = 25;
     }
 
@@ -20,18 +29,18 @@ class Graph{
         
         // If adding a node near existing node, connect it to selected node
         if(nodeNearPos){
-            if(nodeNearPos != this.selected){
-                this.addEdge(nodeNearPos, this.selected);
+            if(nodeNearPos != this.selectedNode){
+                this.addEdge(nodeNearPos, this.selectedNode);
             }
-            this.selected = nodeNearPos;
+            this.selectedNode = nodeNearPos;
         }
         else{
             let newNode = new Node(pos, 10);
             this.nodes.push(newNode);
-            if(this.selected){
-                this.addEdge(this.selected, newNode);
+            if(this.selectedNode){
+                this.addEdge(this.selectedNode, newNode);
             }
-            this.selected = newNode;
+            this.selectedNode = newNode;
         }
     }
 
@@ -86,9 +95,9 @@ class Graph{
     render(){
         noStroke();
 
-        if(this.tracking){
-            this.origin.x = width/2 - this.tracking.position.x;
-            this.origin.y = height/2 - this.tracking.position.y;
+        if(this.trackingNode){
+            this.origin.x = width/2 - this.trackingNode.position.x;
+            this.origin.y = height/2 - this.trackingNode.position.y;
         }
 
         // Render nodes
@@ -97,13 +106,13 @@ class Graph{
         }
 
         // Re-render pre-selected (hovered) node
-        if(this.hovered){
-            this.hovered.render(this.origin, ORANGE);
+        if(this.hoveredNode){
+            this.hoveredNode.render(this.origin, ORANGE);
         }
         
         // Re-render selected node and neighbors with highlights
-        if(this.selected){
-            this.selected.render(this.origin,color(230, 0, 38));
+        if(this.selectedNode){
+            this.selectedNode.render(this.origin,color(230, 0, 38));
         }
 
         // Render edges
@@ -161,60 +170,67 @@ class Graph{
 
 
     trackSelected(){
-        if(this.selected){
-            this.tracking = this.selected;
+        if(this.selectedNode){
+            this.trackingNode = this.selectedNode;
         }
     }
 
 
     stopTracking(){
-        this.tracking = null;
+        this.trackingNode = null;
     }
 
 
     // Update the selected node given a worldspace position (does not convert mouse->world space)
-    updateSelected(positionInWorldSpace){
-        this.selected = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius)
+    updateSelectedNode(positionInWorldSpace){
+        this.selectedNode = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
     }
     
     
     mouseMoved(position){
         let positionInWorldSpace = this.screenToWorldSpace(position);
-        this.hovered = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
+        this.hoveredNode = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
     }
     
     
-    mousePressed(position){
+    mousePressed(mousePos){
         this.stopTracking();
+        this.mouseDownPos = this.screenToWorldSpace(mousePos);
+        
+        this.updateSelectedNode(this.mouseDownPos);
 
-        let positionInWorldSpace = this.screenToWorldSpace(position);
-        this.updateSelected(positionInWorldSpace);
-
-        // Set a node to "dragging" if mouse is over the selected node
-        if(this.selected && this.selected === this.hovered){
-            this.dragging = this.selected;
-            this.dragging.bShouldTick = false;
+        if(this.selectedNode){
+            this.dragNode = this.selectedNode;
+            this.dragNode.bShouldTick = false;
+        }
+        else{
+            this.isDraggingGraph = true;
         }
     }
     
     
     mouseReleased(){
         // Release dragged node
-        if(this.dragging){
-            this.dragging.bShouldTick = true;
-            this.dragging = null;
+        if(this.dragNode){
+            this.dragNode.bShouldTick = true;
+            this.dragNode = null;
+        }
+
+        if(this.isDraggingGraph){
+            this.isDraggingGraph = false;
         }
     }
     
     
     // Either move the "dragging" node or move the graph itself
-    mouseDragged(positionDelta){
-        if(this.dragging){
-            this.dragging.position.add(positionDelta);
+    mouseDragged(newMousePos){
+        let newMousePosWS = this.screenToWorldSpace(newMousePos);
+        
+        if(this.dragNode){  // If dragging a node
+            this.dragNode.position = newMousePosWS;
         }
-        else{
-            this.origin.x += positionDelta.x;
-            this.origin.y += positionDelta.y;
+        else if(this.isDraggingGraph){  // If dragging graph
+            this.origin = p5.Vector.sub(newMousePos, this.mouseDownPos);
         }
     }
 }
