@@ -25,6 +25,8 @@ class NodeInspectorUI{
 		this.createProperty('position', 'World Position');
 		this.createProperty('velocity', 'Velocity');
 		this.createProperty('rotation', 'Rotation');
+		this.createProperty('netTorque', 'Net Torque');
+		this.createProperty('angularVelocity', 'Angular Velocity');
 		this.createProperty('edgeTargetAngles', 'Edge Target Angles');
 		this.createProperty('edgeCurrentAngles', 'Current Edge Angles');
 		this.createProperty('incidentNodeForces', 'Incident Node Forces');

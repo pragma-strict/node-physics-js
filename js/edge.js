@@ -35,26 +35,20 @@ class Edge{
         this.n1.addEdge(this);
         this.n2.addEdge(this);
         
-        // Set up relative edge angle(s) on n1 if necessary
-        if(this.n1.getEdgeCount() == 2){
-            this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n1.edges[0].getIncidentNode(this.n1)));
-            this.n1.edgeCurrentAngles.push(0);
-        }
-        if(this.n1.getEdgeCount() >= 2){
-            this.n1.edgeTargetAngles.push(this.n1.getReferenceAngleToNode(this.n2));
+        // Set up relative edge angle(s) on n1
+        if(this.n1.getEdgeCount() > 0){
+            let n1RelativeAngle = this.n1.getRelativeAngleToNode(this.n1.edges[0].getIncidentNode(this.n1))
+            this.n1.edgeTargetAngles.push(n1RelativeAngle);
             this.n1.incidentNodeForces.push(createVector(0, 0));
             this.n1.edgeCurrentAngles.push(0);
         }
 
-        // Set up relative edge angle(s) on n2 if necessary
-        if(this.n2.getEdgeCount() == 2){
-            this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n2.edges[0].getIncidentNode(this.n2)));
-            this.n1.edgeCurrentAngles.push(0);
-        }
-        if(this.n2.getEdgeCount() >= 2){
-            this.n2.edgeTargetAngles.push(this.n2.getReferenceAngleToNode(this.n1));
-            this.n1.incidentNodeForces.push(createVector(0, 0));
-            this.n1.edgeCurrentAngles.push(0);
+        // Set up relative edge angle(s) on n2
+        if(this.n2.getEdgeCount() > 0){
+            let n2RelativeAngle = this.n2.getRelativeAngleToNode(this.n2.edges[0].getIncidentNode(this.n2))
+            this.n2.edgeTargetAngles.push(n2RelativeAngle);
+            this.n2.incidentNodeForces.push(createVector(0, 0));
+            this.n2.edgeCurrentAngles.push(0);
         }
     }
 

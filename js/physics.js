@@ -13,9 +13,16 @@ class Physics{
 	}
 
 
-	// Return the torque exerted by an arm on a point
-	static calculateTorque2D(force, point){
-
+	// Return the torque exerted on the origin by the force exerted on a moment arm at a point
+	static calculateTorque2D(origin, force, point){
+		let r = p5.Vector.sub(point, origin);
+		console.log("Calculating torque -------- ");
+		console.log("Origin: " + origin);
+		console.log("Force: " + force);
+		console.log("Point: " + point);
+		console.log("R: " + r);
+		console.log("Torque: " + r.cross(force).z);
+		return r.cross(force);
 	}
 
 

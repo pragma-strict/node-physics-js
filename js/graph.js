@@ -2,6 +2,9 @@
 /* 
     Maintains and manages nodes, edges, and the origin of the world. 
     Maybe one day will implement a cool data structure to hold nodes & edges.
+
+    TODO:
+    - Maybe implement a better traversal to use when ticking nodes
 */
 class Graph{
     constructor(originVector)
@@ -62,10 +65,10 @@ class Graph{
 
 
     // Do physics operations every frame
-    tick(deltaTime, mPosWS){
+    tick(deltaTime){
         // Tick nodes
         for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].tick(deltaTime, mPosWS);
+            this.nodes[i].tick(deltaTime);
         }
 
         // Tick edges

@@ -108,8 +108,8 @@ function drawFrame()
 // Ticks all the physics things
 function tickPhysics()
 {
-  let mPosWS = graph.screenToWorldSpace(createVector(mouseX, mouseY));
-  graph.tick(1/5, mPosWS);
+  // let mPosWS = graph.screenToWorldSpace(createVector(mouseX, mouseY));
+  graph.tick(1/5);
 }
 
 
