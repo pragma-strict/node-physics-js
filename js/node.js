@@ -174,7 +174,7 @@ class Node{
         noStroke();
         fill(color);
         ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, 15, 15);
-        Geometry.drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
+        // Geometry.drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
         
         // Render collision bubble
         stroke(200);
@@ -183,17 +183,17 @@ class Node{
         ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, this.radius*2, this.radius*2);
         
         // Render line to show rotation
-        stroke(color);
-        strokeWeight(2);
-        let lineBegin = createVector(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y);
-        let lineEnd = p5.Vector.fromAngle(this.rotation, 20);
-        line(lineBegin.x, lineBegin.y, lineBegin.x + lineEnd.x, lineBegin.y + lineEnd.y);
+        // stroke(color);
+        // strokeWeight(2);
+        // let lineBegin = createVector(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y);
+        // let lineEnd = p5.Vector.fromAngle(this.rotation, 20);
+        // line(lineBegin.x, lineBegin.y, lineBegin.x + lineEnd.x, lineBegin.y + lineEnd.y);
 
         // Render incident node forces
-        this.incidentNodeForces.forEach((force, i) => {
-            let incidentNodePosition = this.edges[i].getIncidentNode(this).position;
-            Geometry.drawVector(force, p5.Vector.add(incidentNodePosition, gridOrigin), GREEN);
-        })
+        // this.incidentNodeForces.forEach((force, i) => {
+        //     let incidentNodePosition = this.edges[i].getIncidentNode(this).position;
+        //     Geometry.drawVector(force, p5.Vector.add(incidentNodePosition, gridOrigin), GREEN);
+        // })
     }
 
     
@@ -233,7 +233,7 @@ class Node{
     
 
     // Return the angle between the horizontal, this node, and the given edge
-    getEdgeAngle(edgeIndex){
+    getAngleToEdge(edgeIndex){
         return this.getReferenceAngle(this.position, edgeIndex.getIncidentNode(this).position);
     }
 

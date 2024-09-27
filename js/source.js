@@ -109,7 +109,7 @@ function drawFrame()
 function tickPhysics()
 {
   // let mPosWS = graph.screenToWorldSpace(createVector(mouseX, mouseY));
-  graph.tick(1/5);
+  graph.tick(1/50);
 }
 
 
@@ -164,9 +164,7 @@ function keyPressed()
     graph.addNode(graph.screenToWorldSpace(createVector(mouseX, mouseY)));
     inspector.setNode(graph.selectedNode);
   }
-  if(key == 's'){ // 3.1590484285249265 to -3.141134651017797
-    let a1 = 4.0;
-    let a2 = -3.0;
-    console.log(a1 + "->" + a2 + ": " + Geometry.updateAngle(a1, a2));
+  if(key == 's'){
+    graph.makeElementFromSelected();
   }
 }

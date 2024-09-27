@@ -118,19 +118,31 @@ class Edge{
 
 
     render(originOffset){
-        // this.updateAngles();
-        stroke(0);
+        // Determine line colour
+        let maxLogForceMag = 10
+        let lineColor = color(0, 0, 0)
+        let netForceLog = log(abs(this.netForceMag + 1))
+        if(this.netForceMag > 0){
+            lineColor.setGreen(map(netForceLog, 0, maxLogForceMag, 0, 255))
+        }
+        else{
+            lineColor.setBlue(map(netForceLog, 0, maxLogForceMag, 0, 255))
+        }
+
+        // Draw line
+        stroke(lineColor);
         strokeWeight(2);
+
         let begin = createVector(this.n1.position.x + originOffset.x, this.n1.position.y + originOffset.y);
         let end = createVector(this.n2.position.x + originOffset.x, this.n2.position.y + originOffset.y);
         line(begin.x, begin.y, end.x, end.y);
 
         // Draw forces acting on nodes from edge
-        let force = p5.Vector.sub(this.n2.position, this.n1.position);
-        force.setMag(this.netForceMag);
-        Geometry.drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
-        force.mult(-1);
-        Geometry.drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
+        // let force = p5.Vector.sub(this.n2.position, this.n1.position);
+        // force.setMag(this.netForceMag);
+        // Geometry.drawVector(force, p5.Vector.add(this.n1.position, originOffset), RED);
+        // force.mult(-1);
+        // Geometry.drawVector(force, p5.Vector.add(this.n2.position, originOffset), RED);
 
         // Draw target angles from nodes
         // fill(RED);

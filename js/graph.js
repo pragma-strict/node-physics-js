@@ -16,7 +16,9 @@ class Graph{
         this.isDraggingGraph = false;
         this.mouseDownPos = null;   // World space position of mouse click relative to origin
         
-        this.selectedNode = null;   // Node that is selected
+        this.selectedNode = null;  // Node that is currently selected, if there is only one, else null
+        this.selectedNodes = [];   // List of nodes that are selected, if any
+        this.elements = [];
         this.hoveredNode = null;    // Node that the mouse is over
         this.dragNode = null;   // Node being held / dragged
         this.dragNodeOrigin = null;  // Position of dragged node before it was grabbed
@@ -35,7 +37,7 @@ class Graph{
             if(nodeNearPos != this.selectedNode){
                 this.addEdge(nodeNearPos, this.selectedNode);
             }
-            this.selectedNode = nodeNearPos;
+            this.selectNode(nodeNearPos);
         }
         else{
             let newNode = new Node(pos, 10);
@@ -43,7 +45,7 @@ class Graph{
             if(this.selectedNode){
                 this.addEdge(this.selectedNode, newNode);
             }
-            this.selectedNode = newNode;
+            this.selectNode(newNode);
         }
     }
 
@@ -57,15 +59,220 @@ class Graph{
     // 
     addEdge(a, b){
         if(this.nodes.includes(a) && this.nodes.includes(b)){   // This check is not efficient
-            let defaultEdgeRigidity = 75;
+            let defaultEdgeRigidity = 750;
             let newEdge = new Edge(a, b, defaultEdgeRigidity);
             this.edges.push(newEdge);
         }
     }
 
 
+    makeElementFromSelected(){
+        // Validate selection
+        if(this.selectedNodes.length != 3){
+            console.log("Can only make elements from triangular selections");
+            return;
+        }
+
+        this.elements.push(new FEMElementTri(this.selectedNodes[0], this.selectedNodes[1], this.selectedNodes[2]));
+    }
+
+
     // Do physics operations every frame
     tick(deltaTime){
+        this.tickFEM(deltaTime);
+        // this.tickNodeBased(deltaTime);
+    }
+
+
+    tickFEM(deltaTime){
+        for(let i = 0; i < this.elements.length; i++){
+            this.elements[i].tick(deltaTime);
+        }
+    }
+
+
+    // Performs forward eliminaiton on an augmented matrix to convert it into REF
+    forwardElimination(m){
+        const n = m.length; // The number of rows
+        
+        // Loop through the pivot column indices
+        for(let pivot = 0; pivot < n - 1; pivot++){ // Go to no - 1 to skip augmented column
+            
+            // For each column, loop through the rows below the pivot index
+            for(let row = pivot + 1; row < n; row++){
+
+                // Get the factor which, when multiplied by the current pivot, would make it equal to m[row][pivot]
+                const factor = m[row][pivot] / m[pivot][pivot];
+
+                // m[row][pivot] is an element in the column below the current pivot that we're trying to zero out
+
+                // Multiply the entire pivot row by the factor and subtract it from the current row to zero out m[row][pivot]
+                // Go all the way to the last column here so our updates get applied to the augmented part too
+                for(let colInCurrentRow = pivot; colInCurrentRow <= n; colInCurrentRow++){
+                    m[row][colInCurrentRow] -= factor * m[pivot][colInCurrentRow];
+                }
+            }
+        }
+    }
+
+
+    // Solves for the unknown vector d based on an REF augmented matrix m
+    backSubstitute(m, d){
+        const n = m.length; // The number of rows
+
+        // Loop through each row, starting from the last (since we need to solve the last ones first)
+        for(let row = n - 1; row >= 0; row--){
+            d[row] = m[row][n]; // Get the augmented element in this row
+
+            // Subtract all of the solved variables in the row multiplied by their coefficients in m
+            for(let solvedRow = row + 1; solvedRow < n; solvedRow++){
+                d[row] -= d[solvedRow] * m[row][solvedRow];
+            }
+
+            // Divide by the coefficient of the unknown in the current row to get the final value
+            d[row] /= m[row][row];
+        }
+    }
+
+
+    // Swap rows i and j
+    swapRows(m, i, j){
+        // Validate i
+        if(i < 0 || i >= m.length){
+            console.log("Input row i (" + i + ") is out of bounds for matrix with " + m.length + " rows.");
+            return m;
+        }
+
+        // Validate j
+        if(j < 0 || j >= m.length){
+            console.log("Input row j (" + j + ") is out of bounds for matrix with " + m.length + " rows.");
+            return m;
+        }
+
+        // Create new matrix
+        let _m = [];
+        for(let currentRow = 0; currentRow < m.length; currentRow++){
+            if(currentRow == i){
+                _m.push(m[j]);
+            }
+            else if(currentRow == j){
+                _m.push(m[i]);
+            }
+            else{
+                _m.push(m[currentRow]);
+            }
+        }
+
+        return _m;
+    }
+
+
+    // Multiply row i by non-zero number x
+    multiplyRow(m, i, x){
+        // Validate i
+        if(i < 0 || i >= m.length){
+            console.log("Input row i (" + i + ") is out of bounds for matrix with " + m.length + " rows.");
+            return m;
+        }
+
+        // Validate x
+        if(x == 0){
+            console.log("The scalar value cannot be zero when multiplying matrix rows.");
+            return m;
+        }
+
+        // Create new matrix
+        let _m = [];
+        for(let currentRow = 0; currentRow < m.length; currentRow++){
+            if(currentRow == i){
+                let newRow = [];
+                for(let currentCol = 0; currentCol < m[0].length; currentCol++){
+                    newRow.push(m[i][currentCol] * x);
+                }
+                _m.push(newRow);
+            }
+            else{
+                _m.push(m[currentRow]);
+            }
+        }
+
+        return _m;
+    }
+
+
+    // Add the row i, scaled by x, to the row j
+    addScaledRow(m, i, x, j){
+        // Validate i
+        if(i < 0 || i >= m.length){
+            console.log("Input row i (" + i + ") is out of bounds for matrix with " + m.length + " rows.");
+            return m;
+        }
+
+        // Validate j
+        if(j < 0 || j >= m.length){
+            console.log("Input row j (" + j + ") is out of bounds for matrix with " + m.length + " rows.");
+            return m;
+        }
+
+        // Validate x
+        if(x == 0){
+            console.log("The scalar value cannot be zero when multiplying matrix rows.");
+            return m;
+        }
+
+        let scaledRow = [];
+        for(let currentCol = 0; currentCol < m[0].length; currentCol++){
+            scaledRow.push(m[i][currentCol] * x);
+        }
+
+        let summedRow = [];
+        for(let currentCol = 0; currentCol < m[0].length; currentCol++){
+            summedRow.push(m[j][currentCol] + scaledRow[currentCol]);
+        }
+
+        // Create new matrix
+        let _m = [];
+        for(let currentRow = 0; currentRow < m.length; currentRow++){
+            if(currentRow == j){
+                _m.push(summedRow);
+            }
+            else{
+                _m.push(m[currentRow]);
+            }
+        }
+
+        return _m;
+    }
+
+
+    augmentMatrix(f, k){
+        let aug = [];
+        for(let i = 0; i < k.length; i++){
+            let row = [];
+            for(let j = 0; j < k[0].length; j++){
+                row.push(k[i][j]);
+            }
+            row.push(f[i]);
+            aug.push(row);
+        }
+        return aug;
+    }
+
+
+
+    // solveDisplacement(f, k, i){
+    //     initialSum = 0;
+    //     for(let j = 0; j < f.length; j++){
+    //         if(j != i){
+    //             initialSum += k[i][j];
+    //         }
+    //     }
+    //     d = f[i] - 
+    // }
+
+
+    // Run the simulation in node-based mode
+    tickNodeBased(deltaTime){
         // Tick nodes
         for(let i = 0; i < this.nodes.length; i++){
             this.nodes[i].tick(deltaTime);
@@ -103,6 +310,11 @@ class Graph{
             this.origin.y = height/2 - this.trackingNode.position.y;
         }
 
+        // Render elements
+        for(let i = 0; i < this.elements.length; i++){
+            this.elements[i].render(this.origin, color(0, 0, 50, 50));
+        }
+
         // Render nodes
         for(let i = 0; i < this.nodes.length; i++){
             this.nodes[i].render(this.origin, 0);
@@ -114,8 +326,8 @@ class Graph{
         }
         
         // Re-render selected node and neighbors with highlights
-        if(this.selectedNode){
-            this.selectedNode.render(this.origin, color(230, 0, 38));
+        for(let i = 0; i < this.selectedNodes.length; i++){
+            this.selectedNodes[i].render(this.origin, color(230, 0, 38));
         }
 
         // Render edges
@@ -186,7 +398,32 @@ class Graph{
 
     // Update the selected node given a worldspace position (does not convert mouse->world space)
     updateSelectedNode(positionInWorldSpace){
-        this.selectedNode = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
+        let nodeNearClick = this.getNodeNearPosition(positionInWorldSpace, this.selectionRadius);
+
+        if(nodeNearClick){
+            this.selectNode(nodeNearClick)
+        } 
+        else{
+            this.clearNodeSelection();
+        }
+    }
+    
+    
+    selectNode(node){
+        if(keyIsDown(SHIFT)){
+            this.selectedNode = null;
+            this.selectedNodes.push(node);
+        }
+        else{
+            this.selectedNode = node;
+            this.selectedNodes = [node];
+        }
+    }
+    
+    
+    clearNodeSelection(){
+        this.selectedNode = null;
+        this.selectedNodes = [];
     }
     
     
