@@ -24,7 +24,24 @@ class Graph{
         this.dragNodeOrigin = null;  // Position of dragged node before it was grabbed
         this.trackingNode = null;   // Node that the graph repositions itself to track
         
+        // Boundary conditions
+        this.forceBoundaries = [];  // List of force vector indices paired with fixed force values
+        this.displacementBoundaries = []; // List of displacement matrix coordinate pairs, paired with fixed displacements
+        this.fixedDOFs = [0, 2, 5];
+
         this.selectionRadius = 25;
+
+        let n1 = this.addNode(createVector(0, 0));
+        let n2 = this.addNode(createVector(100, 0));
+        let n3 = this.addNode(createVector(0, 100));
+
+        this.addEdgeFromIndices(0, 1);
+        this.addEdgeFromIndices(1, 2);
+        this.addEdgeFromIndices(2, 0);
+
+        this.selectedNodes = [n1, n2, n3];
+        this.makeElementFromSelected();
+        this.selectedNodes = [n3];
     }
 
     
@@ -32,12 +49,13 @@ class Graph{
     addNode(pos){
         let nodeNearPos = this.getNodeNearPosition(pos, this.selectionRadius);
         
-        // If adding a node near existing node, connect it to selected node
+        // If adding a node near existing node, connect it to selected node instead
         if(nodeNearPos){
             if(nodeNearPos != this.selectedNode){
                 this.addEdge(nodeNearPos, this.selectedNode);
             }
             this.selectNode(nodeNearPos);
+            return null;
         }
         else{
             let newNode = new Node(pos, 10);
@@ -46,6 +64,7 @@ class Graph{
                 this.addEdge(this.selectedNode, newNode);
             }
             this.selectNode(newNode);
+            return newNode;
         }
     }
 
@@ -77,6 +96,20 @@ class Graph{
     }
 
 
+    cycleNodeConstraintType(){
+        // Update hovered node
+        if(this.hoveredNode){
+            this.hoveredNode.cycleConstraintType();
+        }
+        else{
+            // Update selected nodes
+            for(let i = 0; i < this.selectedNodes.length; i++){
+                this.selectedNodes[i].cycleConstraintType();
+            }
+        }
+    }
+
+
     // Do physics operations every frame
     tick(deltaTime){
         this.tickFEM(deltaTime);
@@ -86,21 +119,107 @@ class Graph{
 
     tickFEM(deltaTime){
         for(let i = 0; i < this.elements.length; i++){
-            this.elements[i].tick(deltaTime);
+            // Calculate stiffness matrix for the element
+            let e = this.elements[i];
+            e.tick(deltaTime);
+            let f = [0, 0, 1, 1, 0, 0];
+            let d = [0, 0, 0, 0, 0, 0];
+            let aug = this.augmentMatrix(f, e.k);
+            // console.log("Augmented: ");
+            // IOUtils.printMatrix(aug);
+            
+            let constrainedAug = this.removeBoundariesFromAugmented(aug);
+            // console.log("Constrained augmented matrix:");
+            // IOUtils.printMatrix(constrainedAug);
+
+            // console.log("Reducing to REF...");
+            let feOk = this.forwardEliminate(constrainedAug);
+            if(!feOk){
+                console.log("<!> Forward elimination failed.");
+                return;
+            }
+            // console.log("REF matrix: ");
+            // IOUtils.printMatrix(constrainedAug);
+
+            let bsOk = this.backSubstitute(constrainedAug, d);
+            if(!bsOk){
+                console.log("<!> Back substitution failed.");
+                return;
+            }
+            console.log("d: ");
+            IOUtils.printColumnVector(d);
         }
     }
 
 
-    // Performs forward eliminaiton on an augmented matrix to convert it into REF
-    forwardElimination(m){
+    compileGlobalForceVector(){
+
+    }
+
+
+    compileGlobalStiffnessMatrix(){
+
+    }
+
+
+    removeBoundariesFromAugmented(aug){
+        const n = aug.length;
+        const numBoundaries = this.fixedDOFs.length;
+        const newAug = new Array(n - numBoundaries).fill(0).map(() => new Array(n + 1 - numBoundaries).fill(0));
+        let newRow = 0;
+        for(let row = 0; row < n; row++){
+            let newCol = 0;
+            if(!this.fixedDOFs.includes(row)){
+                for(let col = 0; col <= n; col++){
+                    if(!this.fixedDOFs.includes(col)){
+                        newAug[newRow][newCol] = aug[row][col];
+                        newCol++;
+                    }
+                }
+                newRow++;
+            }
+        }
+        return newAug;
+    }
+
+
+    // Performs forward eliminaiton on an augmented matrix to convert it into REF. Return false if failed.
+    forwardEliminate(m){
         const n = m.length; // The number of rows
         
-        // Loop through the pivot column indices
-        for(let pivot = 0; pivot < n - 1; pivot++){ // Go to no - 1 to skip augmented column
+        // Loop through the pivot indices
+        for(let pivot = 0; pivot < n - 1; pivot++){ // Go to second-last row because you're zeroing the one below this
             
+            // If the pivot is zero, swap rows in the matrix until there's a non-zero element on each pivot
+            // Commented out for now because swapping changes the mapping from row indices to equations (and thus the
+            // interpretation of the rows when we apply them to actual displacements)
+            // if(m[pivot][pivot] == 0){
+            //     console.log("Found zero-pivot: " + pivot + ", attempting to swap with row below...");
+                
+            //     let swapIndex = pivot;
+            //     for(let j = pivot; j < n; j++){
+            //         if(m[j][pivot] != 0){
+            //             swapIndex = j;
+            //             continue;
+            //         }
+            //     }
+            //     if(swapIndex == pivot){
+            //         console.log("<!> Unable to resolve zero-pivot by swapping. Exiting early to avoid div by zero.");
+            //         return false;
+            //     }
+            //     else{
+            //         console.log("Swapping rows " + pivot + " and " + swapIndex);
+            //         this.swapRows(m, pivot, swapIndex);
+            //     }
+            // }
+
+            if(m[pivot][pivot] == 0){
+                console.log("<!> Zero-element in pivot column. Unable to complete forward substitution.")
+                return false;
+            }
+
             // For each column, loop through the rows below the pivot index
             for(let row = pivot + 1; row < n; row++){
-
                 // Get the factor which, when multiplied by the current pivot, would make it equal to m[row][pivot]
                 const factor = m[row][pivot] / m[pivot][pivot];
 
@@ -108,15 +227,24 @@ class Graph{
 
                 // Multiply the entire pivot row by the factor and subtract it from the current row to zero out m[row][pivot]
                 // Go all the way to the last column here so our updates get applied to the augmented part too
-                for(let colInCurrentRow = pivot; colInCurrentRow <= n; colInCurrentRow++){
-                    m[row][colInCurrentRow] -= factor * m[pivot][colInCurrentRow];
+                let foundNonZero = false;
+                for(let col = 0; col <= n; col++){
+                    m[row][col] -= factor * m[pivot][col];
+                    if(m[row][col] != 0){
+                        foundNonZero = true;
+                    }
+                }
+                if(!foundNonZero){
+                    console.log("<!> A row of all zeroes was created, indicating that this system as infinite solutions. Returning.");
+                    return false;
                 }
             }
         }
+        return true;
     }
 
 
-    // Solves for the unknown vector d based on an REF augmented matrix m
+    // Solves for the unknown vector d based on an REF augmented matrix m. Return false if failed.
     backSubstitute(m, d){
         const n = m.length; // The number of rows
 
@@ -129,9 +257,23 @@ class Graph{
                 d[row] -= d[solvedRow] * m[row][solvedRow];
             }
 
-            // Divide by the coefficient of the unknown in the current row to get the final value
-            d[row] /= m[row][row];
+            // Handle the case where the coefficient of the unknown is zero (we can't solve the unknown then)
+            if(m[row][row] == 0){
+                if(m[row][n] != 0){
+                    console.log("Found row with diagonal element as zero but the augmented element is non-zero. This indicates an inconsistent system with zero solutions.");
+                    return false;
+                }
+                else{
+                    // If both the unknown's coefficient and the augmented element are zero, just set the unknown to zero
+                    d[row] = 0;
+                }
+            }
+            else{
+                // Divide by the coefficient of the unknown in the current row to get the final value
+                d[row] /= m[row][row];
+            }
         }
+        return true;
     }
 
 
@@ -409,8 +551,8 @@ class Graph{
     }
     
     
-    selectNode(node){
-        if(keyIsDown(SHIFT)){
+    selectNode(node, multiSelect = false){
+        if(keyIsDown(SHIFT) || multiSelect){
             this.selectedNode = null;
             this.selectedNodes.push(node);
         }

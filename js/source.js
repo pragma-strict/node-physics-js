@@ -37,7 +37,7 @@ let ID_INSPECTOR = 'p5-node-inspector';
 
 let canvas;
 
-let isPlaying = true;
+let isPlaying = false;
 
 // var restartButton = null;
 // var addButton = null;
@@ -166,5 +166,8 @@ function keyPressed()
   }
   if(key == 's'){
     graph.makeElementFromSelected();
+  }
+  if(key == 'r'){
+    graph.cycleNodeConstraintType();
   }
 }

@@ -43,18 +43,18 @@ class FEMElementTri{
 
     // Every frame
     tick(deltaTime){
-        console.log("Cross: " + this.getCrossProduct());
-        console.log("Cross.z: " + this.getCrossProduct().z);
+        // console.log("Cross: " + this.getCrossProduct());
+        // console.log("Cross.z: " + this.getCrossProduct().z);
         this.area = abs(this.getCrossProduct().z) / 2; // Recalculate the area first, for now
-        console.log("Area: " + this.area);
+        // console.log("Area: " + this.area);
         
         this.calculateStrainDisplacementMatrix();
-        console.log("B: ");
-        IOUtils.printMatrix(this.B);
-
+        // console.log("B: ");
+        // IOUtils.printMatrix(this.B);
+        
         this.calculateStiffnessMatrix();
-        console.log("k: ");
-        IOUtils.printMatrix(this.k);
+        // console.log("k: ");
+        // IOUtils.printMatrix(this.k);
     }
 
 
@@ -101,10 +101,16 @@ class FEMElementTri{
     }
 
 
-    // Element-wise multiplication of matrix M by a scalar x
+    // In-place element-wise multiplication of matrix M by a scalar x
     scaleMatrix(M, x){
-        for(let i = 0; i < M.length; i++){
-            for(let j = 0; j < M[0].length; j++){
+        const numRows = M.length;
+        const numCols = M[0].length;
+        if(numRows == 0 || numRows == 0){
+            console.log("<!> Cannot scale matrix of size " + numCols + " x " + numRows);
+            return;
+        }
+        for(let i = 0; i < numRows; i++){
+            for(let j = 0; j < numCols; j++){
                 M[i][j] *= x;
             }
         }

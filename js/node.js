@@ -38,7 +38,10 @@ class Node{
         this.bounciness = 0.4;
         this.dragStrength = 0.8;    // Higher values -> more drag
         
-        this.bShouldTick = true; 
+        this.constrainedX = false;
+        this.constrainedY = false;
+
+        this.bShouldTick = true;
     }
 
 
@@ -75,6 +78,24 @@ class Node{
         this.tickAngular(deltaTime);
     }
     
+
+    cycleConstraintType(){
+        if(!this.constrainedX && !this.constrainedY){
+            this.constrainedX = true;
+        }
+        else if(this.constrainedX && !this.constrainedY){
+            this.constrainedX = false;
+            this.constrainedY = true;
+        }
+        else if(!this.constrainedX && this.constrainedY){
+            this.constrainedX = true;
+        }
+        else{
+            this.constrainedX = false;
+            this.constrainedY = false;
+        }
+    }
+
     
     // Calculate torque and apply forces to neighboring nodes
     tickAngular(deltaTime){
@@ -171,9 +192,36 @@ class Node{
 
     // 
     render(gridOrigin, color){
-        noStroke();
-        fill(color);
-        ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, 15, 15);
+        const nodeSize = 15;
+
+        // Unconstrained
+        if(!this.constrainedX && !this.constrainedY){
+            noStroke();
+            fill(color);
+            ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, nodeSize, nodeSize);
+        }
+        // Constrained on x
+        if(this.constrainedX){
+            strokeWeight(5);
+            stroke(color);
+            line(
+                gridOrigin.x + this.position.x - (nodeSize / 2), 
+                gridOrigin.y + this.position.y,
+                gridOrigin.x + this.position.x + (nodeSize / 2), 
+                gridOrigin.y + this.position.y,
+            )
+        }
+        // Constrained on y
+        if(this.constrainedY){
+            strokeWeight(5);
+            stroke(color);
+            line(
+                gridOrigin.x + this.position.x, 
+                gridOrigin.y + this.position.y - (nodeSize / 2),
+                gridOrigin.x + this.position.x, 
+                gridOrigin.y + this.position.y + (nodeSize / 2),
+            )
+        }
         // Geometry.drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
         
         // Render collision bubble

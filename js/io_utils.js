@@ -11,21 +11,26 @@ class IOUtils{
 
         // Print
         for(let i = 0; i < m.length; i++){
-            this.printRowVector(m[i]);
+            this.printRowVector(m[i], i % 2);
         }
     }
 
 
     // Print an array as a row
-    static printRowVector(v){
+    static printRowVector(v, appendSpace = false){
         let rowString = "["
         for(let i = 0; i < v.length; i++){
-            rowString += v[i];
+            let numWidth = 5;
+            let numString = v[i].toFixed(3);
+            rowString += numString.slice(0, numWidth);
             if(i < v.length - 1){
                 rowString += ", ";
             }
         }
         rowString += "]";
+        if(appendSpace){
+            rowString += " ";
+        }
         console.log(rowString);
     }
 
