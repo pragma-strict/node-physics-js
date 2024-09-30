@@ -82,19 +82,26 @@ class Node{
     
 
     cycleConstraintType(){
+        // Neither -> both
         if(!this.constrainedX && !this.constrainedY){
             this.constrainedX = true;
-        }
-        else if(this.constrainedX && !this.constrainedY){
-            this.constrainedX = false;
             this.constrainedY = true;
         }
+
+        // Both -> X free
+        else if(this.constrainedX && this.constrainedY){
+            this.constrainedX = false;
+        }
+
+        // X free -> Y free
         else if(!this.constrainedX && this.constrainedY){
             this.constrainedX = true;
+            this.constrainedY = false;
         }
+
+        // Y free -> neither
         else{
             this.constrainedX = false;
-            this.constrainedY = false;
         }
     }
 

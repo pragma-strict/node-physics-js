@@ -67,6 +67,7 @@ class Graph{
         }
         else{
             let newNode = new Node(pos, 10, this.nodes.length);
+            this.F = this.F.concat([0, 0]);
             this.nodes.push(newNode);
             if(this.selectedNode){
                 this.addEdge(this.selectedNode, newNode);
@@ -222,6 +223,8 @@ class Graph{
         this.K = new Array(numGlobalDOFs).fill(0).map(() => new Array(numGlobalDOFs).fill(0));
         const numLocalDOFs = this.elements[0].k.length; // Assume all elements have the same num DOFs (ignoring constraints)
         for(let i = 0; i < this.elements.length; i++){
+            console.log("Local stiffness matrix for element " + i + ": ");
+            IOUtils.printMatrix(this.elements[i].k, true);
             for(let localRow = 0; localRow < numLocalDOFs; localRow++){
                 const globalRow = this.getGlobalFromLocalDOFIndex(this.elements[i], localRow);
                 for(let localCol = 0; localCol < numLocalDOFs; localCol++){
@@ -807,6 +810,7 @@ class Graph{
                 else{
                     this.setNodalForce(this.dragNode, createVector(0, 0));
                 }
+                this.isSettingForceOnDraggedNode = false;
             }
             this.dragNode.bShouldTick = true;
             this.dragNode = null;
