@@ -130,16 +130,19 @@ function mousePressed()
 {
   graph.mousePressed(createVector(mouseX, mouseY));
   inspector.setNode(graph.selectedNode);
+  return false;
 }
 
 
 function mouseReleased(){
-  graph.mouseReleased();
+  graph.mouseReleased(createVector(mouseX, mouseY));
+  return false;
 }
 
 
 function mouseDragged(){
   graph.mouseDragged(createVector(mouseX, mouseY));
+  return false;
 }
 
 

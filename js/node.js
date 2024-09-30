@@ -16,7 +16,9 @@
         - Remove the gridOrigin arg from render()
 */
 class Node{
-    constructor(position, mass){
+    constructor(position, mass, index){
+        this.indexInGraph = index;  // This is a sin, I understand. I have done this for my son.
+
         this.mass = mass;
         this.position = position;
         this.rotation = 0.0;
@@ -205,10 +207,10 @@ class Node{
             strokeWeight(5);
             stroke(color);
             line(
-                gridOrigin.x + this.position.x - (nodeSize / 2), 
-                gridOrigin.y + this.position.y,
-                gridOrigin.x + this.position.x + (nodeSize / 2), 
-                gridOrigin.y + this.position.y,
+                gridOrigin.x + this.position.x, 
+                gridOrigin.y + this.position.y - (nodeSize / 2),
+                gridOrigin.x + this.position.x, 
+                gridOrigin.y + this.position.y + (nodeSize / 2),
             )
         }
         // Constrained on y
@@ -216,10 +218,10 @@ class Node{
             strokeWeight(5);
             stroke(color);
             line(
-                gridOrigin.x + this.position.x, 
-                gridOrigin.y + this.position.y - (nodeSize / 2),
-                gridOrigin.x + this.position.x, 
-                gridOrigin.y + this.position.y + (nodeSize / 2),
+                gridOrigin.x + this.position.x - (nodeSize / 2), 
+                gridOrigin.y + this.position.y,
+                gridOrigin.x + this.position.x + (nodeSize / 2), 
+                gridOrigin.y + this.position.y,
             )
         }
         // Geometry.drawVector(this.velocity, p5.Vector.add(gridOrigin, this.position), BLUE);
@@ -230,6 +232,11 @@ class Node{
         noFill();
         ellipse(gridOrigin.x + this.position.x, gridOrigin.y + this.position.y, this.radius*2, this.radius*2);
         
+        // Render node index
+        fill(0);
+        let textOffset = 15;
+        text(String(this.indexInGraph), gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
+
         // Render line to show rotation
         // stroke(color);
         // strokeWeight(2);
