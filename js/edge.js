@@ -11,7 +11,7 @@ class Edge{
         this.n2 = n2;
         this.targetLength = n1.position.dist(n2.position);
         this.rigidity = rigidity;
-        this.damping = 15; // Fraction of force lost as if due to friction or drag
+        this.damping = 75; // Fraction of force lost as if due to friction or drag
         this.netForceMag = 0;
         
         this.connectNodes();

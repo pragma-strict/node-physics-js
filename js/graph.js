@@ -13,43 +13,61 @@ class Graph{
         this.nodes = new Array();   // Nodes & edge refs are stored here AND in the nodes & edges themselves
         this.edges = new Array();
 
+        // UI fields        
         this.isDraggingGraph = false;
         this.mouseDownPos = null;   // World space position of mouse click relative to origin
-        
         this.selectedNode = null;  // Node that is currently selected, if there is only one, else null
         this.selectedNodes = [];   // List of nodes that are selected, if any
-        this.elements = [];
         this.hoveredNode = null;    // Node that the mouse is over
         this.dragNode = null;   // Node being held / dragged
         this.dragNodeOrigin = null;  // Position of dragged node before it was grabbed
         this.isSettingForceOnDraggedNode = false;
         this.trackingNode = null;   // Node that the graph repositions itself to track
-        
-        this.F = [];  // Global force vector
-        this.D = [];  // Global displacement vector
-
         this.selectionRadius = 25;
-
-        let n1 = this.addNode(createVector(0, 0));
-        let n2 = this.addNode(createVector(100, 0));
-        let n3 = this.addNode(createVector(0, 100));
-        let n4 = this.addNode(createVector(100, 100));
-
-        this.addEdgeFromIndices(0, 1);
-        this.addEdgeFromIndices(1, 2);
-        this.addEdgeFromIndices(2, 0);
-        this.addEdgeFromIndices(1, 3);
-        this.addEdgeFromIndices(2, 3);
-
-        this.selectedNodes = [n1, n2, n3];
-        this.makeElementFromSelected();
-
-        this.selectedNodes = [n2, n4, n3];
-        this.makeElementFromSelected();
         
-        this.selectedNodes = [n1];
+        // FEM fields
+        this.elements = [];
+        this.F = [];  // Global (internal) force vector
+        this.FExternal = [];  // Global (external) force vector
+        this.FNet = []  // Global net force vector
+        this.D = [];  // Global displacement vector
+        this.V = [];  // Global velocity vector
+        this.A = [];  // Global acceleration vector
+        this.M = [[]];  // Global mass matrix. Note: a matrix to allow mass distribution between nodes. Diagonal gives lumped mass.
+        this.C = [[]];  // Global damping matrix (reduces velocities to simulate energy dissipation)
 
-        this.F = new Array(8).fill(0);
+        //=== SETUP FOR FEM SANDBOX ===//
+
+        // // Create nodes and edges
+        // let n1 = this.addNode(createVector(0, 0));
+        // let n2 = this.addNode(createVector(100, 0));
+        // let n3 = this.addNode(createVector(0, 100));
+        // let n4 = this.addNode(createVector(100, 100));
+
+        // this.addEdgeFromIndices(0, 1);
+        // this.addEdgeFromIndices(1, 2);
+        // this.addEdgeFromIndices(2, 0);
+        // this.addEdgeFromIndices(1, 3);
+        // this.addEdgeFromIndices(2, 3);
+
+        // // Create elements
+        // this.selectedNodes = [n1, n2, n3];
+        // this.makeElementFromSelected();
+        // this.selectedNodes = [n2, n4, n3];
+        // this.makeElementFromSelected();
+        // this.selectedNodes = [n1];
+
+        // // Initialize the various arrays and matrices
+        // const numDOFs = 8;
+        // this.F = new Array(numDOFs).fill(0);
+        // this.FExternal = new Array(numDOFs).fill(0);
+        // this.FNet = new Array(numDOFs).fill(0);
+        // this.M = new Array(numDOFs).fill(0).map(() => new Array(numDOFs).fill(0));
+        // for(let i = 0; i < numDOFs; i++){
+        //     this.M[i][i] = 1; // Set diagonal to 1 and leave everything else at 0
+        // }
+        // this.V = new Array(numDOFs).fill(0);
+        // this.A = new Array(numDOFs).fill(0);
     }
 
     
@@ -115,8 +133,8 @@ class Graph{
 
     // Do physics operations every frame
     tick(deltaTime){
-        this.tickFEM(deltaTime);
-        // this.tickNodeBased(deltaTime);
+        // this.tickFEM(deltaTime);
+        this.tickNodeBased(deltaTime);
     }
 
 

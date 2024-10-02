@@ -109,7 +109,7 @@ function drawFrame()
 function tickPhysics()
 {
   // let mPosWS = graph.screenToWorldSpace(createVector(mouseX, mouseY));
-  graph.tick(1/50);
+  graph.tick(1/15);
 }
 
 
