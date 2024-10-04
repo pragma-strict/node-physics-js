@@ -3,7 +3,7 @@
 
 */
 class Physics{
-	static GRAVITATIONAL_CONSTANT = 0.98;
+	static GRAVITATIONAL_CONSTANT = 9.8;
 
 	static calculateGravitationalTorque(armLength, mass, angleToHorizontal) {
 		// var downwardForce = Physics.GRAVITATIONAL_CONSTANT * mass;

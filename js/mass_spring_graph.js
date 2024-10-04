@@ -1,108 +1,68 @@
 
 /* 
-    Maintains and manages nodes, edges, and the origin of the world, as well as some UI-related data 
-    to support basic interactivity.
-
-    Maybe one day will implement a cool data structure to hold nodes & edges.
+    A specialization of graph that supports basic mass-spring calculations.
 */
-class Graph{
+class MassSpringGraph extends Graph{
     constructor(originVector)
     {
-        this.origin = originVector;
-        this.nodes = new Array();   // Nodes & edge refs are stored here AND in the nodes & edges themselves
-        this.edges = new Array();
+        super(originVector);
 
-        // UI fields        
-        this.isDraggingGraph = false;
-        this.mouseDownPos = null;   // World space position of mouse click relative to origin
-        this.selectedNode = null;  // Node that is currently selected, if there is only one, else null
-        this.selectedNodes = [];   // List of nodes that are selected, if any
-        this.hoveredNode = null;    // Node that the mouse is over
-        this.dragNode = null;   // Node being held / dragged
-        this.trackingNode = null;   // Node that the graph repositions itself to track
-        this.selectionRadius = 25;
+        this.defaultEdgeRigidity = 100;
+        this.defaultNodeMass = 10;
     }
     
-
-    // Either create or find an existing node near a given position. Return the node.
-    createOrFindNodeAtPos(pos){
-        let nodeNearPos = this.getNodeNearPosition(pos, this.selectionRadius);
-        if(nodeNearPos){
-            return nodeNearPos;
-        }
-        else{
-            return this.createNode(pos);
-        }
-    }
-
-
-    // Either add a node or connect selected to an existing node
-    createKeyPressed(pos){
-        let node = this.createOrFindNodeAtPos(pos);
-        if(this.selectedNode){
-            this.createEdge(this.selectedNode, node);
-        }
-        this.selectNode(node);
-    }
-
 
     // Add a node to the graph at a given world position
     createNode(pos){
-        let newNode = new Node(pos);
+        let newNode = new MassSpringNode(pos, this.defaultNodeMass);
         this.nodes.push(newNode);
         return newNode;
     }
-    
-    
+
+
     // Add an edge between two nodes
     createEdge(a, b){
-        let newEdge = new Edge(a, b);
+        let newEdge = new MassSpringEdge(a, b, this.defaultEdgeRigidity);
         this.edges.push(newEdge);
         return newEdge;
     }
 
 
-    // Add an edge between nodes at the given indices
-    addEdgeFromIndices(indexA, indexB){
-        this.createEdge(this.nodes[indexA], this.nodes[indexB]);
-    }
-
-
-    // Do physics operations every frame
+    // Run the simulation in node-based mode
     tick(deltaTime){
-        //
+        super.tick(deltaTime);
+
+        // Tick nodes
+        for(let i = 0; i < this.nodes.length; i++){
+            this.nodes[i].tick(deltaTime);
+        }
+
+        // Tick edges
+        for(let i = 0; i < this.edges.length; i++){
+            this.edges[i].tick(deltaTime);
+        }
+
+        // Perform inter-node collision
+        for(let i = 0; i < this.nodes.length; i++){
+            for(let j = 0; j < this.nodes.length; j++){
+                if(i != j){
+                    let n1 = this.nodes[i];
+                    let n2 = this.nodes[j];
+                    let distance = n1.position.dist(n2.position);
+                    if(distance <= (n1.radius + n2.radius)){
+                        let vectorBetween = p5.Vector.sub(n2.position, n1.position);
+                        n1.velocity.reflect(vectorBetween);
+                        n2.velocity.reflect(vectorBetween);
+                    }
+                } 
+            }
+        }
     }
 
 
     // Draw the graph to the screen
     render(){
-        noStroke();
-
-        // Update origin based on tracked node position
-        if(this.trackingNode){
-            this.origin.x = width/2 - this.trackingNode.position.x;
-            this.origin.y = height/2 - this.trackingNode.position.y;
-        }
-
-        // Render nodes
-        for(let i = 0; i < this.nodes.length; i++){
-            this.nodes[i].render(this.origin, 0);
-        }
-
-        // Re-render pre-selected (hovered) node
-        if(this.hoveredNode){
-            this.hoveredNode.render(this.origin, ORANGE);
-        }
-        
-        // Re-render selected node and neighbors with highlights
-        for(let i = 0; i < this.selectedNodes.length; i++){
-            this.selectedNodes[i].render(this.origin, color(230, 0, 38));
-        }
-
-        // Render edges
-        for(let i = 0; i < this.edges.length; i++){
-            this.edges[i].render(this.origin, color(0));
-        }
+        super.render();
     }
 
 
@@ -208,9 +168,16 @@ class Graph{
         
         this.updateSelectedNode(this.mouseDownPos);
 
+        
         if(this.selectedNode){
             this.dragNode = this.selectedNode;
             this.dragNode.bShouldTick = false;
+            
+            // If we're holding down control when we start dragging, make it so that we're setting the force on the dragged node
+            if(keyIsDown(CONTROL)){
+                this.isSettingForceOnDraggedNode = true;
+                this.dragNodeOrigin = this.dragNode.position;
+            }
         }
         else{
             this.isDraggingGraph = true;
@@ -221,6 +188,20 @@ class Graph{
     mouseReleased(newMousePos){
         // Release dragged node
         if(this.dragNode){
+            // Apply force if we're releasing while being in force application mode
+            if(this.isSettingForceOnDraggedNode){
+                let newMousePosWS = this.screenToWorldSpace(newMousePos);
+                let displacement = p5.Vector.sub(newMousePosWS, this.dragNodeOrigin);
+                
+                // Add the force or, if it's really small, zero it
+                if(displacement.mag() > 10){
+                    this.setNodalForce(this.dragNode, displacement);
+                }
+                else{
+                    this.setNodalForce(this.dragNode, createVector(0, 0));
+                }
+                this.isSettingForceOnDraggedNode = false;
+            }
             this.dragNode.bShouldTick = true;
             this.dragNode = null;
             this.dragNodeOrigin = null;
@@ -236,7 +217,7 @@ class Graph{
     mouseDragged(newMousePos){
         let newMousePosWS = this.screenToWorldSpace(newMousePos);
         
-        if(this.dragNode){  // If dragging a node
+        if(this.dragNode && !this.isSettingForceOnDraggedNode){  // If dragging a node
             this.dragNode.position = newMousePosWS;
         }
         else if(this.isDraggingGraph){  // If dragging graph

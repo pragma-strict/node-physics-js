@@ -38,44 +38,52 @@ let ID_INSPECTOR = 'p5-node-inspector';
 let canvas;
 
 let isPlaying = false;
-
-// var restartButton = null;
-// var addButton = null;
+let simulationMode = "fem"; // base, ms, fem
+let tickDeltaTime = 1/10;
 
 let graph;
 let inspector;
 
 function setup() {
-  initializeP5Canvas();
-  // restartButton = button_create(width - (width / 10), height/16, width/14, height/14, "Restart Sim");
-  // addButton = button_create(width - (width / 10), height/16 + height/12, width/14, height/14, "Add Cell");
-  updateCanvas();
-  angleMode(RADIANS);
-  
-  graph = new Graph(createVector(width/2, height/2));
+    initializeP5Canvas();
+    updateCanvas();
+    angleMode(RADIANS);
 
-  inspector = new NodeInspectorUI(ID_INSPECTOR);
+    let dims = createVector(width/2, height/2);
+    switch(simulationMode){
+        case "base":
+        graph = new Graph(dims);
+        break;
+        case "ms":
+        graph = new MassSpringGraph(dims);
+        break;
+        case "fem":
+        graph = new FEMGraph(dims);
+        break;
+    }
 
-  setupGrid();
+    inspector = new NodeInspectorUI(ID_INSPECTOR);
+
+    setupGrid();
 }
 
 
 function initializeP5Canvas(){
-  //let parentStyle = window.getComputedStyle(document.getElementById(ID_PARENT));
-  canvas = createCanvas(windowWidth, windowHeight);
-  let originalMainElement = canvas.parent();
-  canvas.parent(ID_PARENT);
-  originalMainElement.remove();
+    //let parentStyle = window.getComputedStyle(document.getElementById(ID_PARENT));
+    canvas = createCanvas(windowWidth, windowHeight);
+    let originalMainElement = canvas.parent();
+    canvas.parent(ID_PARENT);
+    originalMainElement.remove();
 }
 
 
 function updateCanvas()
 {
-  resizeCanvas(innerWidth, innerHeight);
-  let x = windowWidth - width;
-	let y = windowHeight - height;
-	canvas.position(x, y);
-  // button_updatePosition(restartButton, width - (width / 10), height/ 16);
+    resizeCanvas(innerWidth, innerHeight);
+    let x = windowWidth - width;
+    let y = windowHeight - height;
+    canvas.position(x, y);
+    // button_updatePosition(restartButton, width - (width / 10), height/ 16);
 }
 
 
@@ -86,91 +94,90 @@ function windowResized() {
 
 function drawFrame()
 {
-  background(BG_COL);
-  drawGridLines(graph.origin);
-  // button_draw(restartButton);
+    background(BG_COL);
+    drawGridLines(graph.origin);
 
-  strokeWeight(0);
-  // fill(0);
-  // text(((mouseX - graph.origin.x) + ", " + (mouseY - graph.origin.y)), mouseX, mouseY);
+    strokeWeight(0);
+    fill(0);
+    textAlign(LEFT);
 
-  let displayStatus = "Paused";
-  textAlign(LEFT);
-  if(isPlaying)
-  {
-    displayStatus = "Ticking";
-    tickPhysics();
-  }
-  text(displayStatus, 15, height - 25);
+    // Render the play/pause status
+    let displayStatus = "Paused";
+    if(isPlaying){
+        displayStatus = "Ticking";
+    }
+    text(displayStatus, 15, height - 25);
 }
 
 
 // Ticks all the physics things
 function tickPhysics()
 {
-  // let mPosWS = graph.screenToWorldSpace(createVector(mouseX, mouseY));
-  graph.tick(1/15);
+    graph.tick(tickDeltaTime);
 }
 
 
 function draw()
 {
-  drawFrame();
-  graph.render();
-  inspector.updateDOM();
+    if(isPlaying){
+        tickPhysics();
+    }
+    drawFrame();
+    graph.render();
+    inspector.updateDOM();
 }
 
 
 function mouseMoved(){
-  graph.mouseMoved(createVector(mouseX, mouseY));
+    graph.mouseMoved(createVector(mouseX, mouseY));
 }
 
 
 function mousePressed()
 {
-  graph.mousePressed(createVector(mouseX, mouseY));
-  inspector.setNode(graph.selectedNode);
-  return false;
+    graph.mousePressed(createVector(mouseX, mouseY));
+    inspector.setNode(graph.selectedNode);
+    return false;
 }
 
 
 function mouseReleased(){
-  graph.mouseReleased(createVector(mouseX, mouseY));
-  return false;
+    graph.mouseReleased(createVector(mouseX, mouseY));
+    return false;
 }
 
 
 function mouseDragged(){
-  graph.mouseDragged(createVector(mouseX, mouseY));
-  return false;
+    graph.mouseDragged(createVector(mouseX, mouseY));
+    return false;
 }
 
 
 function keyPressed()
 {
-  if(key == ' ')
-  {
-    isPlaying = !isPlaying;
-  }
-  if(key == 'e')
-  {
-    tickPhysics();
-    drawFrame();
-    graph.render();
-  }
-  if(key == 'd')
-  {
-    graph.trackSelected();
-  }
-  if(key == 'a')
-  {
-    graph.addNode(graph.screenToWorldSpace(createVector(mouseX, mouseY)));
-    inspector.setNode(graph.selectedNode);
-  }
-  if(key == 's'){
-    graph.makeElementFromSelected();
-  }
-  if(key == 'r'){
-    graph.cycleNodeConstraintType();
-  }
+    if(key == ' ')
+    {
+        isPlaying = !isPlaying;
+    }
+    if(key == 'e')
+    {
+        tickPhysics();
+        drawFrame();
+        graph.render();
+    }
+    if(key == 'd')
+    {
+        graph.trackSelected();
+    }
+    if(key == 'a')
+    {
+        graph.createKeyPressed(graph.screenToWorldSpace(createVector(mouseX, mouseY)));
+        inspector.setNode(graph.selectedNode);
+    }
+    if(key == 's' && simulationMode == "fem"){
+        graph.makeElementFromSelected();
+    }
+    if(key == 'r' && simulationMode == "fem"){
+        graph.cycleNodeConstraintType();
+    }
 }
