@@ -7,14 +7,14 @@ class MassSpringGraph extends Graph{
     {
         super(originVector);
 
-        this.defaultEdgeRigidity = 100;
+        this.defaultEdgeRigidity = 200;
         this.defaultNodeMass = 10;
     }
     
 
     // Add a node to the graph at a given world position
     createNode(pos){
-        let newNode = new MassSpringNode(pos, this.defaultNodeMass);
+        let newNode = new MassSpringNode(this.nodes.length, pos, this.defaultNodeMass);
         this.nodes.push(newNode);
         return newNode;
     }
@@ -22,7 +22,7 @@ class MassSpringGraph extends Graph{
 
     // Add an edge between two nodes
     createEdge(a, b){
-        let newEdge = new MassSpringEdge(a, b, this.defaultEdgeRigidity);
+        let newEdge = new MassSpringEdge(a, b, this.defaultEdgeRigidity, this.edges.length);
         this.edges.push(newEdge);
         return newEdge;
     }

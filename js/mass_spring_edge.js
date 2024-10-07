@@ -3,14 +3,14 @@
     Specialization of edges that adds physics properties as part of a mass-spring system.
 */
 class MassSpringEdge extends Edge{
-    constructor(n1, n2, rigidity){
-        super(n1, n2);
+    constructor(n1, n2, rigidity, uid){        
+        super(n1, n2, uid);
 
         this.targetLength = n1.position.dist(n2.position);
         this.rigidity = rigidity;
-        this.damping = 0.75; // Fraction of force lost as if due to friction or drag
+        this.damping = 10; // Fraction of force lost as if due to friction or drag
         this.netForceMag = 0;
-        
+    
         // To be deprecated
         // this.n1TargetAngle = n1.getReferenceAngle(n2.position) - n1.rotation;
         // this.n2TargetAngle = n2.getReferenceAngle(n1.position) - n2.rotation;
@@ -31,9 +31,9 @@ class MassSpringEdge extends Edge{
 
         // Set up relative edge angle(s) on n1
         if(this.n1.getEdgeCount() > 0){
+            this.n1.incidentNodeForces.push(createVector(0, 0));
             // let n1RelativeAngle = this.n1.getRelativeAngleToNode(this.n1.edges[0].getIncidentNode(this.n1))
             // this.n1.edgeTargetAngles.push(n1RelativeAngle);
-            this.n1.incidentNodeForces.push(createVector(0, 0));
             // this.n1.edgeCurrentAngles.push(0);
         }
 
@@ -52,13 +52,21 @@ class MassSpringEdge extends Edge{
         super.tick(deltaTime);
 
         // Find force due to springiness of edge
-        let lengthError = this.getCurrentLength() - this.targetLength;
+        let lengthError = this.getLength() - this.targetLength;
         let springForceMag = lengthError * this.rigidity;
 
         // Find damping force (uses node velocities because it needs to dampen them through application of damp force)
         let vectorBetween = p5.Vector.sub(this.n2.position, this.n1.position).normalize();
         let nodeVelocityDifference = p5.Vector.sub(this.n2.velocity, this.n1.velocity);
         let dampForceMag = vectorBetween.dot(nodeVelocityDifference) * this.damping;
+
+        // Hack because highly damped edges seem to become really stable and then explode
+        // if(dampForceMag > springForceMag){
+            // console.log("Spring: " + springForceMag)
+            // console.log("Damp: " + dampForceMag) // The damp mag should never be the same sign as spring mag, right?
+            // dampForceMag = springForceMag;
+            // console.log("Capping damp force mag")
+        // }
         
         // Accumulate net force
         this.netForceMag = springForceMag + dampForceMag;
@@ -110,6 +118,14 @@ class MassSpringEdge extends Edge{
         else{
             lineColor.setBlue(map(netForceLog, 0, maxLogForceMag, 0, 255));
         }
+
+        // Render node index
+        let edgeLabelColor = color(100, 100, 240);
+        fill(edgeLabelColor);
+        strokeWeight(0);
+        let textOffset = 15;
+        let halfwayPos = p5.Vector.mult(p5.Vector.add(this.n1.position, this.n2.position), 0.5);
+        text(String(this.uid), originOffset.x + halfwayPos.x + textOffset, originOffset.y + halfwayPos.y + textOffset);
 
         // Draw line
         super.render(originOffset, lineColor);
@@ -167,7 +183,7 @@ class MassSpringEdge extends Edge{
                 // this.n1.applyTorque(n1Torque);
         
                 // Calculate and apply equal and opposite force to n2
-                let n2ForceMag = abs(n1Torque) / this.getCurrentLength() * 1500;
+                let n2ForceMag = abs(n1Torque) / this.getLength() * 1500;
                 let n2ForceAngle = this.n1AngularDisplacement >= 0 ? this.n1Angle - PI/2 : this.n1Angle + PI/2;
                 //this.n2.applyForce(p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
                 // console.log("applying force: " + p5.Vector.fromAngle(n2ForceAngle, n2ForceMag));
@@ -189,7 +205,7 @@ class MassSpringEdge extends Edge{
                 // this.n2.applyTorque(n2Torque);
         
                 // Calculate and apply equal and opposite force to n2
-                let n1ForceMag = abs(n2Torque) / this.getCurrentLength() * 1500;
+                let n1ForceMag = abs(n2Torque) / this.getLength() * 1500;
                 let n1ForceAngle = this.n2AngularDisplacement >= 0 ? this.n2Angle - PI/2 : this.n2Angle + PI/2;
                 //this.n1.applyForce(p5.Vector.fromAngle(n1ForceAngle, n1ForceMag));
             }

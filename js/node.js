@@ -19,7 +19,7 @@ class Node{
         this.edges = [];
 
         this.position = position;
-        this.rotation = 0.0;
+        this.rotation = 0;
         this.radius = 25;
 
         this.renderSize = 10;
@@ -53,14 +53,19 @@ class Node{
 
 
     // Return the angle between the horizontal, this node, and the given edge
-    getAngleToEdge(edgeIndex){
-        return this.getReferenceAngle(this.position, edgeIndex.getIncidentNode(this).position);
+    getReferenceAngleToEdge(edgeIndex){
+        return Geometry.getReferenceAngle(this.position, edgeIndex.getIncidentNode(this).position);
     }
 
 
-    // Return angle between horizontal and the given node
+    // Return angle between horizontal and the vector between this and another node
     getReferenceAngleToNode(node){
         return Geometry.getReferenceAngle(this.position, node.position);
+    }
+
+
+    getRelativeAngleToEdge(edgeIndex){
+        
     }
 
 

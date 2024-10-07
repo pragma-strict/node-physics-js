@@ -3,9 +3,10 @@
     The base edge class only stores info about incident nodes, positions, UI, rendering, and the graph.
 */
 class Edge{
-    constructor(n1, n2){
+    constructor(n1, n2, uid = 0){
         this.n1 = n1;
         this.n2 = n2;
+        this.uid = uid;
         
         this.connectNodes();
     }
@@ -45,7 +46,7 @@ class Edge{
     }
 
 
-    getCurrentLength(){
+    getLength(){
         return this.n1.position.dist(this.n2.position);
     }
 

@@ -3,16 +3,26 @@
 */
 class Geometry{
 	   
-	// Return the angle between a and b around the origin in the range (0, TWO_PI)
-	static getAngleBetween(origin, a, b){
+	// Return the signed angle between point a and point b around the origin point. I don't actually know the range since I think I've seen outputs approaching 2_PI
+	static getAngleBetweenSigned(origin, a, b){
 		let toA = p5.Vector.sub(a, origin);
 		let toB = p5.Vector.sub(b, origin);
 		return toA.angleBetween(toB);
 	}
 
 
-	// Return the angle angle between the horizontal, this node, and the given position vector
-	// Angle will be negative if in bottom quadrants and positive if in top quadrants (I think)
+	// Return the angle between point a and point b around the origin point in the range (0, TWO_PI)
+    static getAngleBetween(origin, a, b){
+        let signedAngle = this.getAngleBetweenSigned(origin, a, b);
+        if(signedAngle < 0){
+            return TWO_PI + signedAngle;
+        }
+        return signedAngle;
+    }
+
+
+    // Return the angle between horizontal and the vector from the origin to the point
+    // Angle will be negative if in bottom quadrants and positive if in top quadrants (I think)
 	static getReferenceAngle(origin, point){
 		if(origin instanceof p5.Vector && point instanceof p5.Vector){
 			return Geometry.getAngleBetween(origin, createVector(origin.x + 1, origin.y), point);

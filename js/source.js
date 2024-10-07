@@ -38,7 +38,7 @@ let ID_INSPECTOR = 'p5-node-inspector';
 let canvas;
 
 let isPlaying = false;
-let simulationMode = "fem"; // base, ms, fem
+let simulationMode = "ms"; // base, ms, fem
 let tickDeltaTime = 1/10;
 
 let graph;
