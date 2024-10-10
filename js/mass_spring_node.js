@@ -3,10 +3,11 @@
     Specialization of node that stores physics concepts for a mass-spring model.
 */
 class MassSpringNode extends Node{
-    constructor(index, position, mass){
+    constructor(index, position, mass, tag = ""){
         super(position);
 
         this.indexInGraph = index;
+        this.tag = tag;
 
         this.mass = mass;
         this.velocity = createVector(0, 0);
@@ -35,20 +36,25 @@ class MassSpringNode extends Node{
         super.render(gridOrigin, nodeColor);
 
         // Render adjacent nodal forces from angular
-        stroke(color(100, 100, 255));
-        strokeWeight(1);
-        for(let i = 0; i < this.edges.length; i++){
-            let nodeSSPos = p5.Vector.add(this.edges[i].getIncidentNode(this).position, gridOrigin);
-            let lengthMultiplier = 1;
-            let forceVectorEndSSPos = p5.Vector.add(nodeSSPos, p5.Vector.mult(this.edgeNetForces[i], lengthMultiplier));
-            line(nodeSSPos.x, nodeSSPos.y, forceVectorEndSSPos.x, forceVectorEndSSPos.y);
-        }
+        // stroke(color(100, 100, 255));
+        // strokeWeight(1);
+        // for(let i = 0; i < this.edges.length; i++){
+        //     let nodeSSPos = p5.Vector.add(this.edges[i].getIncidentNode(this).position, gridOrigin);
+        //     let lengthMultiplier = 1;
+        //     let forceVectorEndSSPos = p5.Vector.add(nodeSSPos, p5.Vector.mult(this.edgeNetForces[i], lengthMultiplier));
+        //     line(nodeSSPos.x, nodeSSPos.y, forceVectorEndSSPos.x, forceVectorEndSSPos.y);
+        // }
 
-        // Render node index
+        // Render node index or tag
         fill(0);
         strokeWeight(0);
         let textOffset = 15;
-        text(String(this.indexInGraph), gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
+        if(this.tag != ""){
+            text(this.tag, gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
+        }
+        else{
+            text(String(this.indexInGraph), gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
+        }
     }
 
 

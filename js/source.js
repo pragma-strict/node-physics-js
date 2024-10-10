@@ -39,9 +39,10 @@ let canvas;
 
 let isPlaying = false;
 let simulationMode = "ms"; // base, ms, fem
-let tickDeltaTime = 1/10;
+let tickDeltaTime = 1/30;
 
 let graph;
+let LEBTreeRoot;
 let inspector;
 
 function setup() {
@@ -65,6 +66,8 @@ function setup() {
     inspector = new NodeInspectorUI(ID_INSPECTOR);
 
     setupGrid();
+
+    LEBTreeRoot = new LEBTree(graph);
 }
 
 
@@ -124,6 +127,7 @@ function draw()
     }
     drawFrame();
     graph.render();
+    LEBTreeRoot.render(0);
     inspector.updateDOM();
 }
 

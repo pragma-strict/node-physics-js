@@ -13,8 +13,8 @@ class MassSpringGraph extends Graph{
     
 
     // Add a node to the graph at a given world position
-    createNode(pos){
-        let newNode = new MassSpringNode(this.nodes.length, pos, this.defaultNodeMass);
+    createNode(pos, tag = ""){
+        let newNode = new MassSpringNode(this.nodes.length, pos, this.defaultNodeMass, tag);
         this.nodes.push(newNode);
         return newNode;
     }
