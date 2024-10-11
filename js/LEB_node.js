@@ -11,12 +11,17 @@ class LEBNode{
         this.hypLength = sqrt(pow(sideLength, 2) + pow(sideLength, 2));
         this.dirVector = this.dirVectorFromIndex(dirIndex); // Can probably compute dir analytically from the level
     
-        this.numSubdivisions = 2;
+        this.numSubdivisions = 1;
         
         this.subgridSize = this.numSubdivisions + 2;
         this.subgrid1 = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
         this.subgrid2 = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
         this.subgrid3 = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
+    }
+
+
+    subdivide(graph){
+        //
     }
 
 
@@ -33,22 +38,6 @@ class LEBNode{
         let a4 = p5.Vector.add(a3, p5.Vector.rotate(this.dirVector, PI / 2).setMag(this.hypLength / 2));
         let a7 = p5.Vector.add(a1, p5.Vector.setMag(this.dirVector, this.sideLength / 2));
 
-        // graph.createNode(a1, "a1");
-        // graph.createNode(a2, "a2");
-        // graph.createNode(a3, "a3");
-        // graph.createNode(a4, "a4");
-        // graph.createNode(a5, "a5");
-        // graph.createNode(a6, "a6");
-        // graph.createNode(a7, "a7");
-
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(0, 0)), "a1");
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(this.subgridSize - 1, 0)), "a2");
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(i, j)), "a3");
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(i, j)), "a4");
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(i, j)), "a5");
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(0, this.subgridSize - 1)), "a6");
-        // graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(this.subgridSize - 1, this.subgridSize - 1)), "a7");
-
         // Potential point of confusion below: i is a row index and therefore a y coordinate. j is an column index and therefore
         // an x coordinate. That's why i and j are passed as coordinates in reverse, i.e., (j, i)
 
@@ -61,6 +50,9 @@ class LEBNode{
                 }
                 if(j > 0){
                     graph.createEdge(this.subgrid1[i][j - 1], this.subgrid1[i][j]);
+                }
+                if(i > 0 && j > 0){
+                    graph.createEdge(this.subgrid1[i - 1][j - 1], this.subgrid1[i][j]);
                 }
             }
         }
@@ -77,6 +69,9 @@ class LEBNode{
                 }
                 if(j > 0){
                     graph.createEdge(this.subgrid2[i][j - 1], this.subgrid2[i][j]);
+                }
+                if(i > 0 && j < this.subgridSize - 1){
+                    graph.createEdge(this.subgrid2[i - 1][j + 1], this.subgrid2[i][j]);
                 }
             }
         }
@@ -98,6 +93,9 @@ class LEBNode{
                 }
                 if(j > 0){
                     graph.createEdge(this.subgrid3[i][j - 1], this.subgrid3[i][j]);
+                }
+                if(i > 0 && j > 0){
+                    graph.createEdge(this.subgrid3[i - 1][j - 1], this.subgrid3[i][j]);
                 }
             }
         }

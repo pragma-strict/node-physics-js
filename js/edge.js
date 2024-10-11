@@ -3,10 +3,10 @@
     The base edge class only stores info about incident nodes, positions, UI, rendering, and the graph.
 */
 class Edge{
-    constructor(n1, n2, uid = 0){
+    constructor(n1, n2, indexInGraph){
         this.n1 = n1;
         this.n2 = n2;
-        this.uid = uid;
+        this.indexInGraph = indexInGraph;
         
         this.connectNodes();
     }

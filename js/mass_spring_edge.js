@@ -3,8 +3,8 @@
     Specialization of edges that adds physics properties as part of a mass-spring system.
 */
 class MassSpringEdge extends Edge{
-    constructor(n1, n2, rigidity, uid){        
-        super(n1, n2, uid);
+    constructor(n1, n2, rigidity, indexInGraph){        
+        super(n1, n2, indexInGraph);
 
         this.targetLength = n1.position.dist(n2.position);
         this.rigidity = rigidity;
@@ -119,13 +119,13 @@ class MassSpringEdge extends Edge{
             lineColor.setBlue(map(netForceLog, 0, maxLogForceMag, 0, 255));
         }
 
-        // Render node index
+        // Render edge label
         let edgeLabelColor = color(100, 100, 240);
         fill(edgeLabelColor);
         strokeWeight(0);
         let textOffset = 15;
         let halfwayPos = p5.Vector.mult(p5.Vector.add(this.n1.position, this.n2.position), 0.5);
-        text(String(this.uid), originOffset.x + halfwayPos.x + textOffset, originOffset.y + halfwayPos.y + textOffset);
+        text(String(this.indexInGraph), originOffset.x + halfwayPos.x + textOffset, originOffset.y + halfwayPos.y + textOffset);
 
         // Draw line
         super.render(originOffset, lineColor);

@@ -39,7 +39,7 @@ let canvas;
 
 let isPlaying = false;
 let simulationMode = "ms"; // base, ms, fem
-let tickDeltaTime = 1/30;
+let tickDeltaTime = 1/40;
 
 let graph;
 let LEBTreeRoot;
@@ -183,5 +183,8 @@ function keyPressed()
     }
     if(key == 'r' && simulationMode == "fem"){
         graph.cycleNodeConstraintType();
+    }
+    if(key == 's' && simulationMode == "ms"){
+        graph.deleteNode(graph.nodes[0]);
     }
 }

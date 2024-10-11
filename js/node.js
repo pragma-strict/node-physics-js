@@ -22,7 +22,7 @@ class Node{
         this.rotation = 0;
         this.radius = 15;
 
-        this.renderSize = 10;
+        this.renderSize = 5;
     }
 
 

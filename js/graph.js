@@ -56,7 +56,7 @@ class Graph{
     
     // Add an edge between two nodes
     createEdge(a, b){
-        let newEdge = new Edge(a, b);
+        let newEdge = new Edge(a, b, this.edges.length);
         this.edges.push(newEdge);
         return newEdge;
     }
@@ -65,6 +65,51 @@ class Graph{
     // Add an edge between nodes at the given indices
     addEdgeFromIndices(indexA, indexB){
         this.createEdge(this.nodes[indexA], this.nodes[indexB]);
+    }
+
+
+    deleteNode(node){
+        // Delete the edges attached to this node
+        while(node.edges.length > 0){
+            this.deleteEdge(node.edges[0]);
+        }
+
+        // Overwrite the node with the last node in the list to avoid having to reindex all the ones that come after
+        let lastNodeIndex = this.nodes.length - 1;
+        this.nodes[node.indexInGraph] = this.nodes[lastNodeIndex];
+        this.nodes[node.indexInGraph].indexInGraph = node.indexInGraph;
+        this.nodes.splice(lastNodeIndex, 1);
+
+        // All references to the node should now be removed (once local 'node' goes out of scope), allowing it to be garbage collected
+    }
+
+
+    deleteEdge(edge){
+        // Delete edge from the n1 edge list
+        let edgeIndexN1 = edge.n1.edges.indexOf(edge);
+        if(edgeIndexN1 !== -1){
+            edge.n1.edges.splice(edgeIndexN1, 1);
+        }
+        else{
+            console.log("<!> Couldn't find edge in incident node's edge list. Cannot delete properly.");
+        }
+
+        // Delete edge from the n2 edge list
+        let edgeIndexN2 = edge.n2.edges.indexOf(edge);
+        if(edgeIndexN2 !== -1){
+            edge.n2.edges.splice(edgeIndexN2, 1);
+        }
+        else{
+            console.log("<!> Couldn't find edge in incident node's edge list. Cannot delete properly.");
+        }
+        
+        // Overwrite the edge with the last edge in the list to avoid having to reindex all the ones that come after
+        let lastEdgeIndex = this.edges.length - 1;
+        this.edges[edge.indexInGraph] = this.edges[lastEdgeIndex];
+        this.edges[edge.indexInGraph].indexInGraph = edge.indexInGraph;
+        this.edges.splice(lastEdgeIndex, 1);
+
+        // All references to the edge should now be removed (once local 'edge' goes out of scope), allowing it to be garbage collected
     }
 
 

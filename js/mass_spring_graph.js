@@ -7,7 +7,7 @@ class MassSpringGraph extends Graph{
     {
         super(originVector);
 
-        this.defaultEdgeRigidity = 200;
+        this.defaultEdgeRigidity = 5000;
         this.defaultNodeMass = 10;
     }
     
@@ -43,20 +43,20 @@ class MassSpringGraph extends Graph{
         }
 
         // Perform inter-node collision
-        for(let i = 0; i < this.nodes.length; i++){
-            for(let j = 0; j < this.nodes.length; j++){
-                if(i != j){
-                    let n1 = this.nodes[i];
-                    let n2 = this.nodes[j];
-                    let distance = n1.position.dist(n2.position);
-                    if(distance <= (n1.radius + n2.radius)){
-                        let vectorBetween = p5.Vector.sub(n2.position, n1.position);
-                        n1.velocity.reflect(vectorBetween);
-                        n2.velocity.reflect(vectorBetween);
-                    }
-                } 
-            }
-        }
+        // for(let i = 0; i < this.nodes.length; i++){
+        //     for(let j = 0; j < this.nodes.length; j++){
+        //         if(i != j){
+        //             let n1 = this.nodes[i];
+        //             let n2 = this.nodes[j];
+        //             let distance = n1.position.dist(n2.position);
+        //             if(distance <= (n1.radius + n2.radius)){
+        //                 let vectorBetween = p5.Vector.sub(n2.position, n1.position);
+        //                 n1.velocity.reflect(vectorBetween);
+        //                 n2.velocity.reflect(vectorBetween);
+        //             }
+        //         } 
+        //     }
+        // }
     }
 
 
