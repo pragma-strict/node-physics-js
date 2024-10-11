@@ -120,12 +120,12 @@ class MassSpringEdge extends Edge{
         }
 
         // Render edge label
-        let edgeLabelColor = color(100, 100, 240);
-        fill(edgeLabelColor);
-        strokeWeight(0);
-        let textOffset = 15;
-        let halfwayPos = p5.Vector.mult(p5.Vector.add(this.n1.position, this.n2.position), 0.5);
-        text(String(this.indexInGraph), originOffset.x + halfwayPos.x + textOffset, originOffset.y + halfwayPos.y + textOffset);
+        // let edgeLabelColor = color(100, 100, 240);
+        // fill(edgeLabelColor);
+        // strokeWeight(0);
+        // let textOffset = 15;
+        // let halfwayPos = p5.Vector.mult(p5.Vector.add(this.n1.position, this.n2.position), 0.5);
+        // text(String(this.indexInGraph), originOffset.x + halfwayPos.x + textOffset, originOffset.y + halfwayPos.y + textOffset);
 
         // Draw line
         super.render(originOffset, lineColor);

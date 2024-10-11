@@ -46,15 +46,15 @@ class MassSpringNode extends Node{
         // }
 
         // Render node index or tag
-        // fill(0);
-        // strokeWeight(0);
-        // let textOffset = 15;
-        // if(this.tag != ""){
-        //     text(this.tag, gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
-        // }
-        // else{
-        //     text(String(this.indexInGraph), gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
-        // }
+        fill(0);
+        strokeWeight(0);
+        let textOffset = 15;
+        if(this.tag != ""){
+            text(this.tag, gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
+        }
+        else{
+            text(String(this.indexInGraph), gridOrigin.x + this.position.x + textOffset, gridOrigin.y + this.position.y + textOffset);
+        }
     }
 
 

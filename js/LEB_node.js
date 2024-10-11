@@ -1,50 +1,157 @@
 
 /*
-    Represents a triangular region of space in a 2D LEB hierarchy
+    Represents a triangular region of space in a 2D LEB hierarchy.
+    
+    Note: the anchor points a1-7 are the corner points of the hexahedra subgrids of this triangular element.
+    They start with a1 at the element's tip and are ordered clockwise around the element's perimeter, ending with
+    the only non-perimeter node -- the center node -- a7. a3 is the bottom right corner and a5 is the bottom left.
+
+    Note: a lot of these algorithms refer to left and right and bottom. These are always to be interpreted from a frame of
+    reference local to this node where this node's "tip" (a1) is UP. So the left child touches this node along the anchors
+    a1, a6, and a5, the right child touches this node along the anchors a1, a2, and a3, and the bottom node touches along
+    a5, a4, and a3. 
+
 */
 class LEBNode{
     constructor(level, parent, tipPos, sideLength, dirIndex){
+        // Hierarchy fields
         this.parent = parent;
+        this.leftChild = null;
+        this.rightChild = null;
         this.level = level;
+
+        // Geometry fields
         this.tipPos = tipPos;
         this.sideLength = sideLength;
         this.hypLength = sqrt(pow(sideLength, 2) + pow(sideLength, 2));
+        this.dirIndex = dirIndex;
         this.dirVector = this.dirVectorFromIndex(dirIndex); // Can probably compute dir analytically from the level
     
-        this.numSubdivisions = 1;
-        
+        // Subgrid fields (only apply to leaf nodes)
+        this.numSubdivisions = 1;    
         this.subgridSize = this.numSubdivisions + 2;
         this.subgrid1 = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
         this.subgrid2 = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
         this.subgrid3 = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
+
+        // Subgrid anchor nodes
+        this.a1 = this.tipPos;
+        this.a2 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength / 2));
+        this.a3 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength));
+        this.a4 = p5.Vector.add(this.a1, p5.Vector.setMag(this.dirVector, this.hypLength / 2));
+        this.a5 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength));
+        this.a6 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength / 2));
+        this.a7 = p5.Vector.add(this.a1, p5.Vector.setMag(this.dirVector, this.hypLength / 3));
     }
 
 
     subdivide(graph){
-        //
+        // Delete all interior nodes from graph
+
+        // // For each pair of anchors, check for adjacent elements. Delete final exterior nodes from graph for pairs that
+        // // do not have adjacent elements. Technically, nodes will be regenerated in their exact positions, but it's probably
+        // // easier to delete them... wait... maybe not actually... because then the default case will be to use existing
+        // // exterior nodes because this will always happen except for when generating the outer-most LEB element
+
+        // Create children
+        this.leftChild = new LEBNode(this.level + 1, this, this.a4, this.hypLength / 2, (this.dirIndex + 5) % 8);
+        this.rightChild = new LEBNode(this.level + 1, this, this.a4, this.hypLength / 2, (this.dirIndex + 3) % 8);
+        this.leftChild.instantiateSubgrids(graph);
+        this.rightChild.instantiateSubgrids(graph);
+
+        let hopefullyRightChild = this.leftChild.findAdjacentElement("left");
+        console.log("Result: " + hopefullyRightChild);
+        if(hopefullyRightChild === this.rightChild){
+            console.log("GOOD");
+        }
+        else{
+            console.log("BAD");
+        }
     }
 
 
-    generate(graph){
-        
-        // Get the outer points of the LEB triangle
-        let a1 = this.tipPos;
-        let a3 = p5.Vector.add(this.tipPos, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength));
-        let a5 = p5.Vector.add(this.tipPos, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength));
-        
-        // Get the halfway points to be the corners of the hex subregions
-        let a2 = p5.Vector.add(a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength / 2));
-        let a6 = p5.Vector.add(a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength / 2));
-        let a4 = p5.Vector.add(a3, p5.Vector.rotate(this.dirVector, PI / 2).setMag(this.hypLength / 2));
-        let a7 = p5.Vector.add(a1, p5.Vector.setMag(this.dirVector, this.sideLength / 2));
+    // Traverses the tree and returns another LEBNode element that's acjacent this one in the direction of dirTag where the tag is
+    // on of: "left", "right", "bottom". You can check the returned element's level field to check its relative resolution (could
+    // be equal, one higher, or one lower).
+    findAdjacentElement(dirTag){
+        // Early return if this node is root
+        if(!this.parent){
+            console.log("<!> Cannot find adjacent element of LEB node: parent is null.");
+            return null;
+        }
 
+        // Do the stuff
+        switch(dirTag){
+            case "left":
+                // Easy case, we're direct neighbours
+                if(this.parent.leftChild === this){
+                    return this.parent.rightChild;
+                }
+                else{
+                    // Recursive case: we need the left child of the parent's bottom neighbour
+                    let parentBottomNeighbour = this.parent.findAdjacentElement("bottom");
+                    if(parentBottomNeighbour){
+                        return parentBottomNeighbour.leftChild;
+                    }
+                    return null;
+                }
+            case "right":
+                // Easy case, we're direct neighbours
+                if(this.parent.rightChild === this){
+                    return this.parent.leftChild;
+                }
+                else{
+                    // Recursive case: we need the right child of the parent's bottom neighbour
+                    let parentBottomNeighbour = this.parent.findAdjacentElement("bottom");
+                    if(parentBottomNeighbour){
+                        return parentBottomNeighbour.rightChild;
+                    }
+                    return null;
+                }
+            case "bottom":
+                // Get the left child of the parent's right neighbour
+                if(this.parent.leftChild === this){
+                    let parentRightNeighbour = this.parent.findAdjacentElement("right");
+                    if(parentRightNeighbour){
+                        return parentRightNeighbour.leftChild;
+                    }
+                    return null;
+                }
+                // Get the right child of the parent's left neighbour
+                if(this.parent.rightChild === this){
+                    let parentLeftNeighbour = this.parent.findAdjacentElement("right");
+                    if(parentLeftNeighbour){
+                        return parentLeftNeighbour.rightChild;
+                    }
+                    return null;
+                }
+            default:
+                console.log("Invalid input dirTag to findAdjacentElement: " + dirTag);
+                return null;
+        }
+    }
+
+
+    getOtherChild(child){
+        if(this.leftChild === child){
+            return this.rightChild;
+        }
+        if(this.rightChild === child){
+            return this.leftChild;
+        }
+        console.log("<!> The child provided to getOtherChild was neither the left or the right child.");
+        return null;
+    }
+
+
+    instantiateSubgrids(graph){
         // Potential point of confusion below: i is a row index and therefore a y coordinate. j is an column index and therefore
         // an x coordinate. That's why i and j are passed as coordinates in reverse, i.e., (j, i)
 
         // Generate subgrid 1
         for(let i = 0; i < this.subgridSize; i++){
             for(let j = 0; j < this.subgridSize; j++){
-                this.subgrid1[i][j] = graph.createNode(this.subgridCoordinateToPosition(a1, a2, a7, a6, createVector(j, i)));
+                this.subgrid1[i][j] = graph.createNode(this.subgridCoordinateToPosition(this.a1, this.a2, this.a7, this.a6, createVector(j, i)));
                 if(i > 0){
                     graph.createEdge(this.subgrid1[i - 1][j], this.subgrid1[i][j]);
                 }
@@ -61,7 +168,7 @@ class LEBNode{
         for(let i = 0; i < this.subgridSize; i++){
             for(let j = 0; j < this.subgridSize; j++){
                 if(i > 0){
-                    this.subgrid2[i][j] = graph.createNode(this.subgridCoordinateToPosition(a7, a2, a3, a4, createVector(j, i)));
+                    this.subgrid2[i][j] = graph.createNode(this.subgridCoordinateToPosition(this.a7, this.a2, this.a3, this.a4, createVector(j, i)));
                     graph.createEdge(this.subgrid2[i - 1][j], this.subgrid2[i][j]);
                 }
                 else{
@@ -80,7 +187,7 @@ class LEBNode{
         for(let i = 0; i < this.subgridSize; i++){
             for(let j = 0; j < this.subgridSize; j++){
                 if(i > 0 && j < this.subgridSize - 1){
-                    this.subgrid3[i][j] = graph.createNode(this.subgridCoordinateToPosition(a6, a7, a4, a5, createVector(j, i)));
+                    this.subgrid3[i][j] = graph.createNode(this.subgridCoordinateToPosition(this.a6, this.a7, this.a4, this.a5, createVector(j, i)));
                 }
                 else if(i == 0){
                     this.subgrid3[i][j] = this.subgrid1[this.subgridSize - 1][j];
@@ -99,12 +206,6 @@ class LEBNode{
                 }
             }
         }
-
-
-        // let hexEdge1Nodes = this.generateNodesFromPoints(graph, this.subdivideEdge(p1, p1p2Center, numSubdivisions));
-        // let hexEdge2Nodes = this.generateNodesFromPoints(graph, this.subdivideEdge(p1p2Center, triCenter, numSubdivisions));
-        // let hexEdge3Nodes = this.generateNodesFromPoints(graph, this.subdivideEdge(triCenter, p1p3Center, numSubdivisions));
-        // let hexEdge4Nodes = this.generateNodesFromPoints(graph, this.subdivideEdge(p1p3Center, p1, numSubdivisions));
     }
 
 

@@ -15,7 +15,8 @@ class LEBTree{
 
     generate(){
         this.rootNodes.push(new LEBNode(0, null, createVector(0, 0), this.L0Size, 3));
-        this.rootNodes[0].generate(this.referenceGraph);
+        this.rootNodes[0].subdivide(this.referenceGraph);
+        // this.rootNodes[0].instantiateSubgrids(this.referenceGraph);
     }
 
 
