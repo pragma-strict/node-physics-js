@@ -122,11 +122,16 @@ class Graph{
     // Draw the graph to the screen
     render(){
         noStroke();
-
+        
         // Update origin based on tracked node position
         if(this.trackingNode){
             this.origin.x = width/2 - this.trackingNode.position.x;
             this.origin.y = height/2 - this.trackingNode.position.y;
+        }
+        
+        // Render edges
+        for(let i = 0; i < this.edges.length; i++){
+            this.edges[i].render(this.origin, color(0));
         }
 
         // Render nodes
@@ -142,11 +147,6 @@ class Graph{
         // Re-render selected node and neighbors with highlights
         for(let i = 0; i < this.selectedNodes.length; i++){
             this.selectedNodes[i].render(this.origin, color(230, 0, 38));
-        }
-
-        // Render edges
-        for(let i = 0; i < this.edges.length; i++){
-            this.edges[i].render(this.origin, color(0));
         }
     }
 

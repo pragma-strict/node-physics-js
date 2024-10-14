@@ -28,6 +28,13 @@ class MassSpringGraph extends Graph{
     }
 
 
+    deleteNode(node){
+        super.deleteNode(node);
+
+        // Do more stuff here
+    }
+
+
     // Run the simulation in node-based mode
     tick(deltaTime){
         super.tick(deltaTime);
