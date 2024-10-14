@@ -85,23 +85,9 @@ class Graph{
 
 
     deleteEdge(edge){
-        // Delete edge from the n1 edge list
-        let edgeIndexN1 = edge.n1.edges.indexOf(edge);
-        if(edgeIndexN1 !== -1){
-            edge.n1.edges.splice(edgeIndexN1, 1);
-        }
-        else{
-            console.log("<!> Couldn't find edge in incident node's edge list. Cannot delete properly.");
-        }
-
-        // Delete edge from the n2 edge list
-        let edgeIndexN2 = edge.n2.edges.indexOf(edge);
-        if(edgeIndexN2 !== -1){
-            edge.n2.edges.splice(edgeIndexN2, 1);
-        }
-        else{
-            console.log("<!> Couldn't find edge in incident node's edge list. Cannot delete properly.");
-        }
+        // Delete edges from the node objects incident to the edge
+        edge.n1.deleteEdge(edge);
+        edge.n2.deleteEdge(edge);
         
         // Overwrite the edge with the last edge in the list to avoid having to reindex all the ones that come after
         let lastEdgeIndex = this.edges.length - 1;

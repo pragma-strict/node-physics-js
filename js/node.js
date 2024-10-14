@@ -52,6 +52,17 @@ class Node{
     }
 
 
+    deleteEdge(edge){
+        let edgeIndex = this.edges.indexOf(edge);
+        if(edgeIndex !== -1){
+            this.edges.splice(edgeIndex, 1);
+        }
+        else{
+            console.log("<!> Couldn't find edge in incident node's edge list. Cannot delete properly.");
+        }
+    }
+
+
     // Return the angle between the horizontal, this node, and the given edge
     getReferenceAngleToEdge(edgeIndex){
         return Geometry.getReferenceAngle(this.position, edgeIndex.getIncidentNode(this).position);
