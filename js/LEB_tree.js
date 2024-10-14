@@ -18,21 +18,21 @@ class LEBTree{
         this.rootNodes[0].instantiateNodes(this.referenceGraph);
         this.rootNodes[0].instantiateEdges(this.referenceGraph);
         this.rootNodes[0].subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.leftChild.subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.leftChild.leftChild.subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.leftChild.subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.rightChild.subdivide(this.referenceGraph);
-        this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.rightChild.rightChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.leftChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.leftChild.leftChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.leftChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.rightChild.subdivide(this.referenceGraph);
+        // this.rootNodes[0].rightChild.leftChild.leftChild.leftChild.rightChild.rightChild.subdivide(this.referenceGraph);
     }
 
 
     // 
     render(drawColor){
-        this.rootNodes.forEach((node) => {
-            node.render(this.referenceGraph.origin, drawColor);
-        });
+        // this.rootNodes.forEach((node) => {
+        //     node.render(this.referenceGraph.origin, drawColor);
+        // });
     }
 
 
