@@ -134,7 +134,7 @@ class MassSpringNode extends Node{
 
         // Assert fraction okay
         if(fractionOfExistingAngle > TWO_PI || fractionOfExistingAngle < 0){
-            console.log("<!> This shouldn't happen.");
+            console.log("<!> This shouldn't happen. Fraction of existing angle: " + fractionOfExistingAngle);
             return;
         }
 

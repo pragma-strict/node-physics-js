@@ -1,27 +1,10 @@
 
-
-/**
- * A way to specify a strip of points in an LEB node's grid.
- */
-// class LEBSubgridStrip{
-//     constructor(indexMultiplier, stride){
-//         this.indexMultiplier = indexMultiplier;
-//         this.stride = stride;
-//     }
-// }
-
-
 /*
     Represents a triangular region of space in a 2D LEB hierarchy.
     
-    Note: the anchor points a1-7 are the corner points of the hexahedra subgrids of this triangular element.
-    They start with a1 at the element's tip and are ordered clockwise around the element's perimeter, ending with
-    the only non-perimeter node -- the center node -- a7. a3 is the bottom right corner and a5 is the bottom left.
-
-    Note: a lot of these algorithms refer to left and right and bottom. These are always to be interpreted from a frame of
-    reference local to this node where this node's "tip" (a1) is UP. So the left child touches this node along the anchors
-    a1, a6, and a5, the right child touches this node along the anchors a1, a2, and a3, and the bottom node touches along
-    a5, a4, and a3. 
+    Note: a lot of algorithms here are described with directional terms like "up", "down", etc. These are to be interpreted
+    within a local reference frame where the triangle is oriented to have left-right symmetry and is pointing upwards. The
+    top vertex in this orientation is the "tip". The "left" subgrid is the subdivision region in the bottom left.
 
 */
 class LEBNode{
@@ -39,42 +22,9 @@ class LEBNode{
         this.dirIndex = dirIndex;
         this.dirVector = this.dirVectorFromIndex(dirIndex); // Can probably compute dir analytically from the level
     
-        // Subgrid fields (only applies to leaf nodes)
-        this.numSubdivisions = 0; // This is fixed at zero for now
-        this.subgridSize = this.numSubdivisions + 2;
-        this.subgridTop = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
-        this.subgridRight = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
-        this.subgridLeft = new Array(this.subgridSize).fill(null).map(() => new Array(this.subgridSize));
-
-        // Subgrid anchor positions
-        this.a1 = this.tipPos;
-        this.a2 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength / 2));
-        this.a3 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength));
-        this.a4 = p5.Vector.add(this.a1, p5.Vector.setMag(this.dirVector, this.hypLength / 2));
-        this.a5 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength));
-        this.a6 = p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength / 2));
-        this.a7 = p5.Vector.add(this.a1, p5.Vector.setMag(this.dirVector, this.hypLength / 3));
-
-        // Subgrid anchor positions
-        // this.anchors = [
-        //     this.tipPos,
-        //     p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength / 2)),
-        //     p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength)),
-        //     p5.Vector.add(this.a1, p5.Vector.setMag(this.dirVector, this.hypLength / 2)),
-        //     p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength)),
-        //     p5.Vector.add(this.a1, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength / 2)),
-        //     p5.Vector.add(this.a1, p5.Vector.setMag(this.dirVector, this.hypLength / 3)),
-        // ];
-
-        this.anchors = [
-            this.tipPos,
-            p5.Vector.add(this.tipPos, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength / 2)),
-            p5.Vector.add(this.tipPos, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength / 2)),
-            p5.Vector.add(this.tipPos, p5.Vector.setMag(this.dirVector, this.hypLength / 4)),
-            p5.Vector.add(this.tipPos, p5.Vector.rotate(this.dirVector, PI / 4).setMag(this.sideLength)),
-            p5.Vector.add(this.tipPos, p5.Vector.setMag(this.dirVector, this.hypLength / 2)),
-            p5.Vector.add(this.tipPos, p5.Vector.rotate(this.dirVector, -PI / 4).setMag(this.sideLength)),
-        ];
+        // Anchor positions
+        this.anchors = new Array(7).fill(null);
+        this.updateAnchorPositions(tipPos, this.dirVector);
 
         // Store all nodes in a single array with 3x the number of rows. Subgrid order: top, left, right.
         this.grid = new Array(7).fill(null);
@@ -102,11 +52,43 @@ class LEBNode{
 
     /**
      * To do:
-
+        - Anchor positions are only used during generation and probably break when subdividing while not
+          in original position. Make anchor positions _relative_ to the tip under no rotation? Somehow
+          rigidbody rotation is going to need to be handled here it seems so that subdivisions can happen
+          under dynamic positions and deformations.
     */
+
+    render(gridOrigin, drawColor){
+        let c1WS = p5.Vector.add(gridOrigin, this.grid[0].position);
+        let c2WS = p5.Vector.add(gridOrigin, this.grid[4].position);
+        let c3WS = p5.Vector.add(gridOrigin, this.grid[6].position);
+        stroke(drawColor);
+        strokeWeight(2);
+        line(c1WS.x, c1WS.y, c2WS.x, c2WS.y);
+        line(c2WS.x, c2WS.y, c3WS.x, c3WS.y);
+        line(c1WS.x, c1WS.y, c3WS.x, c3WS.y);
+    }
+
+
+    // The current direction vector (from node 0 to node 5)
+    updateAnchorPositions(tipPos, dir){
+        this.tipPos = tipPos;
+        this.anchors[0] = this.tipPos;
+        this.anchors[1] = p5.Vector.add(this.tipPos, p5.Vector.rotate(dir, -PI / 4).setMag(this.sideLength / 2));
+        this.anchors[2] = p5.Vector.add(this.tipPos, p5.Vector.rotate(dir, PI / 4).setMag(this.sideLength / 2));
+        this.anchors[3] = p5.Vector.add(this.tipPos, p5.Vector.setMag(dir, this.hypLength / 4));
+        this.anchors[4] = p5.Vector.add(this.tipPos, p5.Vector.rotate(dir, PI / 4).setMag(this.sideLength));
+        this.anchors[5] = p5.Vector.add(this.tipPos, p5.Vector.setMag(dir, this.hypLength / 2));
+        this.anchors[6] = p5.Vector.add(this.tipPos, p5.Vector.rotate(dir, -PI / 4).setMag(this.sideLength));
+    }
 
 
     subdivide(graph){
+        // Make sure the node is a leaf
+        if(!this.isLeaf()){
+            return;
+        }
+        
         // 
         this.deleteInternalEdges(graph);
         
@@ -124,6 +106,9 @@ class LEBNode{
             }
         }
         
+        let currentDirVector = p5.Vector.sub(this.grid[5].position, this.grid[0].position).normalize();
+        this.updateAnchorPositions(this.grid[0].position, currentDirVector);
+
         // Create children
         // console.log("Grid[3]: " + this.grid[3]);
         this.rightChild = new LEBNode(this.level + 1, this, this.anchors[5], this.hypLength / 2, (this.dirIndex + 3) % 8);
@@ -233,12 +218,6 @@ class LEBNode{
     }
 
 
-    // Return true only if this LEB node has no children
-    isLeaf(){
-        return !this.rightChild && !this.leftChild;
-    }
-
-
     // Return a list of evenly-spaced vectors on an edge, starting at p1 and ending at p2
     subdivideEdge(p1, p2, numSubdivisions){
         let edge = p5.Vector.sub(p2, p1);
@@ -274,7 +253,38 @@ class LEBNode{
         }
     }
 
+    
+    // Return true only if this LEB node has no children
+    isLeaf(){
+        return !this.rightChild && !this.leftChild;
+    }
 
+
+    // Return true if the given worldspace coordinates fall within this node. Copy-pasted from
+    // chatGPT. Don't ask.
+    isPositionWithinWS(pos){
+        // Get the current corner positions of the node
+        let c1 = this.grid[0].position;
+        let c2 = this.grid[4].position;
+        let c3 = this.grid[6].position;
+
+        // I think this does the cross product? Somehow of 3 positions?
+        function sign(p1, p2, p3) {
+            return (p1.x - p3.x) * (p2.y - p3.y) -
+                   (p2.x - p3.x) * (p1.y - p3.y);
+        }
+    
+        const d1 = sign(pos, c1, c2);
+        const d2 = sign(pos, c2, c3);
+        const d3 = sign(pos, c3, c1);
+    
+        const hasNeg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        const hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+        
+        // If the signs are either all positive or all negative, the position is inside
+        return !(hasNeg && hasPos);
+    }
+    
 
     //=== FUNCTION PURGATORY ===//
 

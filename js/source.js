@@ -134,6 +134,7 @@ function draw()
 
 function mouseMoved(){
     graph.mouseMoved(createVector(mouseX, mouseY));
+    LEBTreeRoot.mouseMoved(createVector(mouseX, mouseY));
 }
 
 
@@ -185,6 +186,7 @@ function keyPressed()
         graph.cycleNodeConstraintType();
     }
     if(key == 's' && simulationMode == "ms"){
-        graph.deleteNode(graph.nodes[0]);
+        LEBTreeRoot.hoveredNode.subdivide(graph);
+        LEBTreeRoot.updateHoveredNode();
     }
 }
