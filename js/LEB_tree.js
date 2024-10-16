@@ -12,7 +12,7 @@ class LEBTree{
         this.rootNodes = [];
         this.graph = graph;
 
-        this.generate();
+        // this.generate();
     }
 
 
@@ -71,6 +71,9 @@ class LEBTree{
 
 
     updateHoveredNode(){
+        if(this.rootNodes.length === 0){
+            return;
+        }
         let mousePosWS = this.graph.screenToWorldSpace(createVector(mouseX, mouseY));
         this.hoveredNode = this.getNodeUnderMouse(mousePosWS);
     }

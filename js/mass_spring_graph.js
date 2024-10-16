@@ -7,7 +7,7 @@ class MassSpringGraph extends Graph{
     {
         super(originVector);
 
-        this.defaultEdgeRigidity = 5000;
+        this.defaultEdgeRigidity = 1000;
         this.defaultNodeMass = 10;
     }
     

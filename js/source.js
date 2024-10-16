@@ -39,7 +39,7 @@ let canvas;
 
 let isPlaying = false;
 let simulationMode = "ms"; // base, ms, fem
-let tickDeltaTime = 1/40;
+let tickDeltaTime = 1/10;
 
 let graph;
 let LEBTreeRoot;
