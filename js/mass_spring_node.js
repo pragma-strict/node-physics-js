@@ -54,26 +54,26 @@ class MassSpringNode extends Node{
         //     line(nodeSSPos.x, nodeSSPos.y, forceVectorEndSSPos.x, forceVectorEndSSPos.y);
         // }
 
-        let vectorScaleFactor = 1;
+        // let vectorScaleFactor = 1;
 
-        // Render the net force
-        stroke(color(100, 100, 255));
-        strokeWeight(2);
-        let nodePosSS = p5.Vector.add(this.position, gridOrigin);
-        let forceVectorEndSS = p5.Vector.add(nodePosSS, p5.Vector.mult(this.netForce, vectorScaleFactor));
-        line(nodePosSS.x, nodePosSS.y, forceVectorEndSS.x, forceVectorEndSS.y);
+        // // Render the net force
+        // stroke(color(100, 100, 255));
+        // strokeWeight(2);
+        // let nodePosSS = p5.Vector.add(this.position, gridOrigin);
+        // let forceVectorEndSS = p5.Vector.add(nodePosSS, p5.Vector.mult(this.netForce, vectorScaleFactor));
+        // line(nodePosSS.x, nodePosSS.y, forceVectorEndSS.x, forceVectorEndSS.y);
         
-        let offset = 4;
+        // let offset = 4;
 
-        // Render the filter vector
-        stroke(color(200, 0, 0));
-        let filterVectorEndSS = p5.Vector.add(nodePosSS, p5.Vector.mult(this.filterVector, vectorScaleFactor));
-        line(nodePosSS.x - offset, nodePosSS.y, filterVectorEndSS.x - offset, filterVectorEndSS.y);
+        // // Render the filter vector
+        // stroke(color(200, 0, 0));
+        // let filterVectorEndSS = p5.Vector.add(nodePosSS, p5.Vector.mult(this.filterVector, vectorScaleFactor));
+        // line(nodePosSS.x - offset, nodePosSS.y, filterVectorEndSS.x - offset, filterVectorEndSS.y);
         
-        // Render the filtered vector
-        stroke(color(50, 200, 50));
-        let finalVectorEndSS = p5.Vector.add(nodePosSS, p5.Vector.mult(this.filterForce(this.netForce, this.filterVector), vectorScaleFactor));
-        line(nodePosSS.x + offset, nodePosSS.y, finalVectorEndSS.x + offset, finalVectorEndSS.y);
+        // // Render the filtered vector
+        // stroke(color(50, 200, 50));
+        // let finalVectorEndSS = p5.Vector.add(nodePosSS, p5.Vector.mult(this.filterForce(this.netForce, this.filterVector), vectorScaleFactor));
+        // line(nodePosSS.x + offset, nodePosSS.y, finalVectorEndSS.x + offset, finalVectorEndSS.y);
 
         // Render node index or tag
         fill(0);
@@ -202,161 +202,18 @@ class MassSpringNode extends Node{
     }
 
 
-    // Filter a force vector based on a filter vector and return the resulting force.
-    // This uses a combination of the filter's direction and magnitude.
-    // If the filter's magnitude is zero, it should not be applied at all. 
-    // If its direction matches that of the force, it should not be applied at all, regardless of its magnitude.
-    // If its direction is opposite to that of the force, its magnitude should be subtracted from that of the force with
-    // a hard limit at zero.
-    filterForce(force, filterVector, printDebug = false){
-        // Pass thru for low forces
-        if(force.mag() < 0.000001){
-            if(printDebug){
-                console.log("Input force is low. Filter disabled.");
-            }
-            return force;
-        }
-        
-        if(filterVector.mag() < 0.00001){
-            if(printDebug){
-                console.log("Filter magnitude is low. Filter disabled.");
-            }
-            return force;
-        }
-
-        let normalizedDot = p5.Vector.dot(p5.Vector.normalize(force), p5.Vector.normalize(filterVector));
-        let dotBetweenZeroOne = (normalizedDot + 1) / 2; // Add one to move dot into range [0, 2] then divide by 2 for range [0, 1]
-        let fractionOfFilterMag = Math.min(filterVector.mag() / force.mag(), 1);
-        // Multiply force by 1 - mag fraction to apply clamping based on magnitude
-        // Multiply force by (normalizedDot + 1) / 2 to apply clamping based on direction
-        // Fade between these methods according to the dot
-        let magSuppression = fractionOfFilterMag * (dotBetweenZeroOne);
-        let dirSuppression = dotBetweenZeroOne * (1 - dotBetweenZeroOne);
-        // let totalSuppression = Math.min(magSuppression + dirSuppression, 1);
-        let totalSuppression = dirSuppression;
-        if(printDebug){
-            console.log(" ");
-            console.log(">>> Filtering force <<<");
-            console.log("Force mag: " + force.mag());
-            console.log("Filter mag: " + filterVector.mag());
-            console.log("Normalized dot: " + normalizedDot);
-            console.log("magSuppression: " + magSuppression);
-            console.log("dirSuppression: " + dirSuppression);
-            console.log("totalSuppression: " + totalSuppression);
-        }
-        return p5.Vector.mult(force, (1 - totalSuppression));
-    }
-
-
-    getSuppressionCoeff(v, filterMag, filterDir){
-
-    }
-
-
-    getFilteredVector(v, filterVec, printDebug = false){
-        if(printDebug){
-            console.log(" ");
-            console.log(">>> Filtering force <<<");
-            console.log("Input vector: " + v);
-            console.log("Filter vector: " + filterVec);
-        }
-        
-        if(v.mag() < 0.000001){
-            if(printDebug){
-                console.log("Input vector mag is low. Filter disabled.");
-                console.log(" ");
-            }
-            return v;
-        }
-        
-        if(filterVec.mag() < 0.00001){
-            if(printDebug){
-                console.log("Filter magnitude is low. Filter disabled.");
-                console.log(" ");
-            }
-            return v;
-        }
-
-        let magAggressionExp = 8; // Large values suppress the mag coeff more strongly
-
-        let filterMag = filterVec.mag();
-        let filterDir = p5.Vector.normalize(filterVec);
-        let coeffMagBased = pow(1 - (Math.min(1, filterMag / v.mag())), magAggressionExp);
-        let coeffDirBased = (p5.Vector.normalize(v).dot(filterDir) + 1) / 2;
-        let coeffTotal = Math.min(1, coeffMagBased + coeffDirBased);
-        
-        if(printDebug){
-            console.log("Filter mag: " + filterMag);
-            console.log("Filter dir: " + filterDir);
-            console.log("Coeff (mag): " + coeffMagBased);
-            console.log("Coeff (dir): " + coeffDirBased);
-            console.log("Coeff (total): " + coeffTotal);
-            console.log(" ");
-        }
-
-        return p5.Vector.mult(v, coeffTotal);
-        // return p5.Vector.mult(v, (1 - this.getSuppressionCoeff(v, filterVec.mag(), p5.Vector.normalize(filterVec))));
-    }
-
-
-    // getNormalizedDot
-
 
     // Calculate a physics step
     tick(deltaTime){
         super.tick(deltaTime);
 
         if(this.bShouldTick){
-            console.log(" ");
-            console.log(" ");
-            console.log(">>> Tick <<<");
-
-            console.log("Pre filter: Prev net force: " + this.prevNetForce);
-            console.log("Pre filter: Curr net force: " + this.netForce);
-            console.log("Pre filter: Delta F: " + p5.Vector.sub(this.netForce, this.prevNetForce).mag());
-
-            // Filter the net force
-            // this.netForce = this.filterForce(this.netForce, this.filterVector, true);
-            this.netForce = this.getFilteredVector(this.netForce, this.filterVector, true);
-            // console.log("Filtered force: " + this.filterForce(this.netForce, this.filterVector));
-            
-            // Decay the filter vector
-            this.filterVector.mult(0.9);
-            
-            // let prevVelocity = this.velocity.copy();
-
             // Apply acceleration and position
             let acceleration = p5.Vector.div(this.netForce, this.mass);
-            console.log("Accel: " + acceleration);
             this.velocity.add(p5.Vector.mult(acceleration, deltaTime));
-            console.log("Velocity: " + this.velocity);
             this.position.add(p5.Vector.mult(this.velocity, deltaTime));
-            
-            // // Update filter vector according to delta V instead of delta F
-            // let deltaV = p5.Vector.sub(this.velocity, prevVelocity);
-            // console.log("Delta v: " + deltaV);
-            // console.log("Filter before: " + this.filterVector);
-            // this.filterVector.add(deltaV);
-            // console.log("Filter after: " + this.filterVector);
 
-            let postFilterDeltaF = p5.Vector.sub(this.netForce, this.prevNetForce);
-
-            // I think we only want to update the filter by delta F by the degree to which it's in the same
-            // direction as the velocity. If delta F is going in the opposite direction of the velocity we don't really need
-            // to kick the filter in.
-
-            let scaledVelocityDeltaFDot = (p5.Vector.dot(p5.Vector.normalize(postFilterDeltaF), p5.Vector.normalize(this.velocity)) + 1) / 2;
-
-            // Update the filter vector as the post-filter deltaF scaled by the codirectionality with the velocity
-            // this.filterVector.add(p5.Vector.mult(postFilterDeltaF, scaledVelocityDeltaFDot));
-    
-            // Clear net force
-            console.log("Post filter: Prev net force: " + this.prevNetForce);
-            console.log("Post filter: Curr net force: " + this.netForce);
-            console.log("Post filter: Delta F: " + postFilterDeltaF.mag());
-
-            console.log("Rolling over force & applying gravity & boundaries...");
-            this.prevNetForce = this.netForce.copy();
+            // Clear force for next tick
             this.netForce = createVector();
     
             // Generate a drag force based on velocity
@@ -364,7 +221,6 @@ class MassSpringNode extends Node{
             drag.mult(-1);
             drag.mult(this.dragStrength);
             this.applyForce(drag);
-            console.log("Applying drag: " + drag);
             
             // Apply gravity
             let fGravity = createVector(0, Physics.GRAVITATIONAL_CONSTANT * this.mass);
@@ -372,21 +228,10 @@ class MassSpringNode extends Node{
 
             // Apply bottom boundary
             if(this.position.y > 0){
-                console.log(">>> APPLYING BOUNDARY <<<");
                 this.position.y = 0;
-                // this.velocity.y *= -this.bounciness;
-                // let nextTargetVelocityY = this.velocity.y * -this.bounciness;
-                let requiredDeltaVY = -1 * this.velocity.y * this.bounciness; // Req'd acceleration
-                let requiredForceY = requiredDeltaVY * this.mass;
-                this.netForce.y = requiredForceY;
-                // this.velocity.y += requiredDeltaVY;
                 this.velocity.y *= -this.bounciness;
-                // this.netForce.y = 0;
+                this.netForce.y = 0;
             }
-
-            console.log("EOF: Prev net force: " + this.prevNetForce);
-            console.log("EOF: Curr net force: " + this.netForce);
-
         }
     }
     
@@ -459,6 +304,60 @@ class MassSpringNode extends Node{
         if(this.bShouldTick){
             this.netForce.add(force);
         }
+    }
+
+
+
+    //=== GRAVEYARD ===//
+
+    // Filter a force vector based on a filter vector and return the resulting force.
+    // This uses a combination of the filter's direction and magnitude.
+    // If the filter's magnitude is zero, it should not be applied at all. 
+    // If its direction matches that of the force, it should not be applied at all, regardless of its magnitude.
+    // If its direction is opposite to that of the force, its magnitude should be subtracted from that of the force with
+    // a hard limit at zero.
+    getFilteredVector(v, filterVec, printDebug = false){
+        if(printDebug){
+            console.log(" ");
+            console.log(">>> Filtering force <<<");
+            console.log("Input vector: " + v);
+            console.log("Filter vector: " + filterVec);
+        }
+        
+        if(v.mag() < 0.000001){
+            if(printDebug){
+                console.log("Input vector mag is low. Filter disabled.");
+                console.log(" ");
+            }
+            return v;
+        }
+        
+        if(filterVec.mag() < 0.00001){
+            if(printDebug){
+                console.log("Filter magnitude is low. Filter disabled.");
+                console.log(" ");
+            }
+            return v;
+        }
+
+        let magAggressionExp = 8; // Large values suppress the mag coeff more strongly
+
+        let filterMag = filterVec.mag();
+        let filterDir = p5.Vector.normalize(filterVec);
+        let coeffMagBased = pow(1 - (Math.min(1, filterMag / v.mag())), magAggressionExp);
+        let coeffDirBased = (p5.Vector.normalize(v).dot(filterDir) + 1) / 2;
+        let coeffTotal = Math.min(1, coeffMagBased + coeffDirBased);
+        
+        if(printDebug){
+            console.log("Filter mag: " + filterMag);
+            console.log("Filter dir: " + filterDir);
+            console.log("Coeff (mag): " + coeffMagBased);
+            console.log("Coeff (dir): " + coeffDirBased);
+            console.log("Coeff (total): " + coeffTotal);
+            console.log(" ");
+        }
+
+        return p5.Vector.mult(v, coeffTotal);
     }
     
 }
